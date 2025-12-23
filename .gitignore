@@ -8,3 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Project-specific
+step1_data/cache/*.csv
+reports/checkpoints/*.keras
+reports/main/
+reports/notebook/
+*.keras
+*.h5
