@@ -5,15 +5,20 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "agno>=2.3.21",
     "ccxt>=4.5.28",
+    "fastapi[standard]>=0.127.0",
     "keras>=3.13.0",
     "matplotlib>=3.10.8",
     "numpy>=2.3.5",
+    "openai>=2.14.0",
     "pandas>=2.3.3",
     "pandas-stubs~=2.3.3",
+    "pyflakes>=3.4.0",
     "scikit-learn>=1.8.0",
     "tensorflow>=2.20.0",
     "tf2onnx>=1.8.4",
+    "uvicorn>=0.40.0",
 ]
 
 [dependency-groups]
