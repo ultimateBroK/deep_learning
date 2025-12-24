@@ -77,7 +77,7 @@ def save_markdown_report(
 | Metric | Giá trị |
 |--------|---------|
 | MAE (Sai số trung bình) | ${metrics.get('mae', 0):.2f} |
-| RMSE (Săn bậc 2 sai số) | ${metrics.get('rmse', 0):.2f} |
+| RMSE (Căn bậc 2 sai số) | ${metrics.get('rmse', 0):.2f} |
 | MAPE (Sai số phần trăm) | {metrics.get('mape', 0):.2f}% |
 
 ---
