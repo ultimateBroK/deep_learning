@@ -13,9 +13,15 @@ Cách dùng:
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 import re
+
+# Suppress TensorFlow warnings TRƯỚC KHI import bất kỳ module nào
+# Phải set ở đây để có hiệu lực trước khi các module khác import TensorFlow
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Chỉ hiển thị ERROR và WARNING nghiêm trọng
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Tắt oneDNN warnings
 
 # Thêm thư mục gốc vào path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -153,8 +159,19 @@ def main():
     # Parse args
     args = parse_args()
 
-    # Import các module "nặng" sau khi parse args để:
+    # Import utils.runtime TRƯỚC để suppress warnings ngay từ đầu
     # - `python main.py --help` chạy nhanh và không in log TensorFlow
+    from utils import (
+        configure_tensorflow_runtime,
+        print_tensorflow_info,
+        create_results_folder,
+        save_markdown_report,
+        save_config,
+        save_metrics,
+        set_random_seed,
+    )
+    
+    # Import các module "nặng" sau khi đã suppress warnings
     from step1_data import fetch_binance_data
     from step2_preprocessing import prepare_data_for_lstm
     from step3_model import build_bilstm_model, print_model_summary
@@ -165,15 +182,6 @@ def main():
         calculate_direction_accuracy,
     )
     from step5_visualization import plot_training_history, plot_predictions, plot_all_in_one
-    from utils import (
-        configure_tensorflow_runtime,
-        print_tensorflow_info,
-        create_results_folder,
-        save_markdown_report,
-        save_config,
-        save_metrics,
-        set_random_seed,
-    )
     
     print("\n" + "="*70)
     print(" " * 15 + "DỰ BÁO GIÁ BITCOIN VỚI BiLSTM")

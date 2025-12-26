@@ -15,9 +15,23 @@ Lưu ý:
 
 import os
 import random
+import warnings
 
 import numpy as np
+
+# Suppress warnings trước khi import TensorFlow
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Chỉ hiển thị ERROR và WARNING nghiêm trọng
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Tắt oneDNN warnings
+
+# Suppress FutureWarning về np.object
+warnings.filterwarnings('ignore', category=FutureWarning, message='.*np.object.*')
+warnings.filterwarnings('ignore', message='.*oneDNN.*')
+warnings.filterwarnings('ignore', message='.*CUDA.*')
+
 import tensorflow as tf
+
+# Suppress TensorFlow warnings sau khi import
+tf.get_logger().setLevel('ERROR')
 
 
 def set_random_seed(seed: int, deterministic: bool = False) -> None:
@@ -61,22 +75,29 @@ def configure_tensorflow_runtime(
         inter_op_threads: Số thread cho operations song song khác
         enable_xla: Bật XLA optimization
     """
-    # Cấu hình số threads
-    tf.config.threading.set_intra_op_parallelism_threads(intra_op_threads)
-    tf.config.threading.set_inter_op_parallelism_threads(inter_op_threads)
+    # Suppress warnings khi cấu hình
+    old_level = tf.get_logger().level
+    tf.get_logger().setLevel('ERROR')
     
-    # Bật XLA optimization
-    if enable_xla:
-        os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
-    
-    # Chỉ chạy trên CPU (nếu có GPU thì ẩn đi; nếu không có GPU thì bỏ qua)
     try:
-        gpus = tf.config.list_physical_devices('GPU')
-        if gpus:
-            tf.config.set_visible_devices([], 'GPU')
-    except Exception as e:
-        # Không để lỗi runtime nhỏ làm hỏng toàn pipeline
-        print(f"⚠️  Không thể cấu hình visible GPU devices: {e}")
+        # Cấu hình số threads
+        tf.config.threading.set_intra_op_parallelism_threads(intra_op_threads)
+        tf.config.threading.set_inter_op_parallelism_threads(inter_op_threads)
+        
+        # Bật XLA optimization
+        if enable_xla:
+            os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
+        
+        # Chỉ chạy trên CPU (nếu có GPU thì ẩn đi; nếu không có GPU thì bỏ qua)
+        try:
+            gpus = tf.config.list_physical_devices('GPU')
+            if gpus:
+                tf.config.set_visible_devices([], 'GPU')
+        except Exception as e:
+            # Không để lỗi runtime nhỏ làm hỏng toàn pipeline
+            pass  # Suppress error message
+    finally:
+        tf.get_logger().setLevel(old_level)
     
     # In thông tin cấu hình
     print("=" * 60)
@@ -96,7 +117,14 @@ def get_gpu_info():
     Returns:
         True nếu có GPU, False nếu không
     """
-    gpus = tf.config.list_physical_devices('GPU')
+    # Suppress warnings khi check GPU
+    old_level = tf.get_logger().level
+    tf.get_logger().setLevel('ERROR')
+    
+    try:
+        gpus = tf.config.list_physical_devices('GPU')
+    finally:
+        tf.get_logger().setLevel(old_level)
     
     if gpus:
         print(f"✅ Tìm thấy {len(gpus)} GPU:")
