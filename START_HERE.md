@@ -235,4 +235,3 @@ Chọn 1 trong 2 cách:
 2. **Nếu bạn thích nhanh gọn:**
    → Chạy CLI: `uv run main.py --epochs 20 --limit 1500`
 
-**Chúc bạn thành công! 🚀**

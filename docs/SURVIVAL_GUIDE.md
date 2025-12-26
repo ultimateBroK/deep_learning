@@ -395,4 +395,3 @@ Nếu bạn theo dõi từng bước và gặp vấn đề:
 2. Đọc ANALOGIES.md để hiểu khái niệm
 3. Xem error message và tìm trong Troubleshooting
 
-**Chúc bạn thành công! 🚀**

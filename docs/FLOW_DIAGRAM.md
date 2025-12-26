@@ -466,4 +466,4 @@ Quan trọng:
 3. EarlyStopping giúp tránh overfitting
 4. Metrics đánh giá chất lượng model
 
-**Hy vọng flow diagram này giúp bạn hiểu rõ quy trình! 🚀**
+

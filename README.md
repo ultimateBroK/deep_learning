@@ -166,3 +166,4 @@ Mỗi lần chạy sẽ tạo folder chứa các file:
 - **Mỗi folder chỉ làm 1 việc** - đừng lo lắng về việc code ở đâu
 - **Comments bằng tiếng Việt** - đọc comments để hiểu code
 - **Từng bước một** - không cần hiểu hết ngay, cứ làm từng bước
+
