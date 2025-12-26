@@ -99,7 +99,7 @@ class DataScaler:
             data: Dữ liệu đã scale
         
         Returns:
-            Dữ liệu gốc ( chưa scale)
+            Dữ liệu gốc (chưa scale)
         """
         # Đảm bảo data là 2D array
         if len(data.shape) == 1:

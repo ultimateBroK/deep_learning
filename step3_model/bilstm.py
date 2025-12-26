@@ -17,7 +17,6 @@ Lợi ích:
 - Kết quả thường tốt hơn LSTM thường
 """
 
-import numpy as np
 from typing import Tuple
 import tensorflow as tf
 from tensorflow import keras
@@ -51,7 +50,10 @@ def build_bilstm_model(
     """
     model = models.Sequential(name="BiLSTM_Price_Prediction")
     
-    # Layer đầu tiên: Bidirectional LSTM
+    # Layer đầu tiên: Input layer (để tránh warning về input_shape)
+    model.add(layers.Input(shape=input_shape))
+    
+    # Layer thứ hai: Bidirectional LSTM
     # return_sequences=True để pass cho LSTM layer tiếp theo
     model.add(layers.Bidirectional(
         layers.LSTM(
@@ -59,7 +61,6 @@ def build_bilstm_model(
             return_sequences=len(lstm_units) > 1,
             name="bilstm_1"
         ),
-        input_shape=input_shape,
         name="bidirectional_1"
     ))
     model.add(layers.Dropout(dropout_rate, name="dropout_1"))
@@ -111,7 +112,7 @@ def print_model_summary(model: models.Sequential):
     trainable_params = sum([tf.size(w).numpy() for w in model.trainable_weights])
     non_trainable_params = total_params - trainable_params
     
-    print(f"\n📊 Thống kê:")
+    print("\n📊 Thống kê:")
     print(f"   Total parameters: {total_params:,}")
     print(f"   Trainable: {trainable_params:,}")
     print(f"   Non-trainable: {non_trainable_params:,}")

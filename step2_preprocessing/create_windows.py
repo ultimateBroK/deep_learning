@@ -99,7 +99,7 @@ def split_data(
     n_val = int(n_samples * val_ratio)
     n_test = n_samples - n_train - n_val
     
-    print(f"📊 Chia dữ liệu:")
+    print("📊 Chia dữ liệu:")
     print(f"   Train: {n_train} samples ({train_ratio*100}%)")
     print(f"   Val: {n_val} samples ({val_ratio*100}%)")
     print(f"   Test: {n_test} samples ({(1-train_ratio-val_ratio)*100}%)")

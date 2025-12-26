@@ -135,28 +135,34 @@ def calculate_direction_accuracy(
 ) -> float:
     """
     Tính độ chính xác khi dự đoán xu hướng (tăng/giảm)
-    
+
+    So sánh chiều xu hướng thực tế với dự đoán:
+    - true_direction = actual[t+1] - actual[t] (xu hướng thực tế)
+    - pred_direction = pred[t+1] - actual[t] (dự đoán đi từ actual[t])
+
     Args:
-        y_true: Giá trị thật
-        y_pred: Dự đoán
+        y_true: Giá trị thật (đã inverse transform)
+        y_pred: Dự đoán (đã inverse transform)
         threshold: Ngưỡng coi là "không đổi" (tương đương spread, phí)
-    
+
     Returns:
         Độ chính xác (0-1)
     """
-    # Tính sự thay đổi
+    # Xu hướng thực tế: actual[t] -> actual[t+1]
     true_change = np.diff(y_true)
-    pred_change = np.diff(y_pred)
-    
+
+    # Dự đoán xu hướng từ actual[t] đến pred[t+1]
+    pred_change = y_pred[1:] - y_true[:-1]
+
     # Xác định xu hướng (tăng = 1, giảm = -1, không đổi = 0)
     true_direction = np.where(true_change > threshold, 1, np.where(true_change < -threshold, -1, 0))
     pred_direction = np.where(pred_change > threshold, 1, np.where(pred_change < -threshold, -1, 0))
-    
+
     # Tính độ chính xác
     accuracy = np.mean(true_direction == pred_direction)
-    
+
     print(f"📈 Độ chính xác xu hướng / Direction accuracy: {accuracy*100:.2f}%")
-    
+
     return accuracy
 
 
