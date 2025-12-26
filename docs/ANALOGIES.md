@@ -165,7 +165,7 @@ Bạn muốn dự đoán thời tiết ngày mai.
 ### Giải thích ML
 - Số samples mỗi lần tính gradient (cập nhật weights)
 
-### Ví dụ đời life: Học từ vựng tiếng Anh
+### Ví dụ đời sống: Học từ vựng tiếng Anh
 
 **Batch size = 1 (Online learning):**
 - Học 1 từ → kiểm tra → điều chỉnh cách học
