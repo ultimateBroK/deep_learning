@@ -10,8 +10,7 @@ Giải thích bằng ví dụ đời sống:
 
 from datetime import datetime
 from pathlib import Path
-import pandas as pd
-import re
+import polars as pl
 
 
 def _project_root() -> Path:
@@ -34,49 +33,76 @@ def _default_data_path(timeframe: str) -> Path:
 
 def _infer_timeframe_from_filename(path: Path) -> str | None:
     name = path.name.lower()
-    if re.search(r"(?:^|_)4h(?:_|\\.)", name) or "4h" in name:
+    if "4h" in name:
         return "4h"
-    if re.search(r"(?:^|_)1d(?:_|\\.)", name) or "1d" in name:
+    if "1d" in name:
         return "1d"
     return None
 
 
-def _normalize_binance_export_csv(df_raw: pd.DataFrame) -> pd.DataFrame:
+def _normalize_binance_export_csv(df_raw: pl.DataFrame) -> pl.DataFrame:
     """
     Chuẩn hoá CSV kiểu "Binance export" về schema thống nhất:
     datetime/open/high/low/close/volume
     """
     if df_raw is None or len(df_raw) == 0:
-        return pd.DataFrame(columns=["datetime", "open", "high", "low", "close", "volume"])
-
-    df = df_raw.copy()
-    df.columns = [str(c).strip() for c in df.columns]
+        return pl.DataFrame(
+            schema=["datetime", "open", "high", "low", "close", "volume"]
+        )
 
     # Map cột (CSV của bạn có format: Open time, Open, High, Low, Close, Volume, ...)
     required = ["Open time", "Open", "High", "Low", "Close", "Volume"]
-    missing = [c for c in required if c not in df.columns]
+    columns = df_raw.columns
+    missing = [c for c in required if c not in columns]
     if missing:
         raise ValueError(
             f"CSV thiếu cột bắt buộc: {missing}. "
-            f"Hiện có: {list(df.columns)}"
+            f"Hiện có: {list(columns)}"
         )
 
-    out = pd.DataFrame()
-    out["datetime"] = pd.to_datetime(df["Open time"], errors="coerce", utc=True)
-    # Đưa về naive datetime (dễ in/report). Pipeline không phụ thuộc timezone.
-    out["datetime"] = out["datetime"].dt.tz_convert(None)
+    # Tạo DataFrame mới với schema chuẩn
+    # Strip khoảng trắng ở cột Open time trước khi parse
+    df_raw = df_raw.with_columns([
+        pl.col("Open time").str.strip_chars()
+    ])
 
-    for col_in, col_out in [
-        ("Open", "open"),
-        ("High", "high"),
-        ("Low", "low"),
-        ("Close", "close"),
-        ("Volume", "volume"),
-    ]:
-        out[col_out] = pd.to_numeric(df[col_in], errors="coerce")
+    # Kiểm tra xem cột Open time có chứa " UTC" không bằng cách lấy 1 mẫu đầu tiên
+    first_sample = df_raw.select(pl.col("Open time")).row(0)[0]
+    has_utc = " UTC" in first_sample
 
-    out = out.dropna(subset=["datetime", "close"]).sort_values("datetime").reset_index(drop=True)
-    return out[["datetime", "open", "high", "low", "close", "volume"]]
+    # Parse datetime theo format phù hợp
+    if has_utc:
+        df_parsed = df_raw.with_columns([
+            pl.col("Open time").str.strptime(pl.Datetime, format="%Y-%m-%d %H:%M:%S%.f UTC", strict=False)
+        ])
+    else:
+        df_parsed = df_raw.with_columns([
+            pl.col("Open time").str.strptime(pl.Datetime, format="%Y-%m-%d %H:%M:%S%.f", strict=False)
+        ])
+
+    out = (
+        df_parsed
+        .rename({
+            "Open time": "datetime",
+            "Open": "open",
+            "High": "high",
+            "Low": "low",
+            "Close": "close",
+            "Volume": "volume"
+        })
+        .with_columns([
+            pl.col("datetime").dt.replace_time_zone(None),
+            pl.col("open").cast(pl.Float64),
+            pl.col("high").cast(pl.Float64),
+            pl.col("low").cast(pl.Float64),
+            pl.col("close").cast(pl.Float64),
+            pl.col("volume").cast(pl.Float64)
+        ])
+        .filter(pl.col("datetime").is_not_null() & pl.col("close").is_not_null())
+        .sort("datetime")
+    )
+
+    return out.select(["datetime", "open", "high", "low", "close", "volume"])
 
 
 def fetch_binance_data(
@@ -86,7 +112,7 @@ def fetch_binance_data(
     limit: int = 1500,
     save_cache: bool = True,
     cache_dir: str = None
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """
     Đọc dữ liệu giá từ file CSV local (mặc định: `data/btc_1d_data_2018_to_2025.csv`)
     
@@ -129,8 +155,7 @@ def fetch_binance_data(
     # Nếu cache đã tồn tại và save_cache=True, đọc từ cache
     if save_cache and cache_path.exists():
         print(f"📂 Đang đọc dữ liệu từ cache: {cache_path}")
-        df = pd.read_csv(cache_path)
-        df['datetime'] = pd.to_datetime(df['datetime'])
+        df = pl.read_csv(cache_path, try_parse_dates=True)
         return df
 
     print(f"📥 Đang đọc dữ liệu từ CSV: {data_file}")
@@ -139,19 +164,25 @@ def fetch_binance_data(
         # Chỉ cảnh báo nhẹ để không làm hỏng notebook cũ
         print(f"ℹ️  (Bỏ qua) symbol={symbol} — hiện đang dùng dữ liệu từ file CSV local.")
 
-    raw = pd.read_csv(data_file)
+    raw = pl.read_csv(data_file)
     df = _normalize_binance_export_csv(raw)
 
+    if len(df) == 0:
+        raise ValueError(
+            f"DataFrame rỗng sau khi normalize. Có thể do format datetime không hợp lệ "
+            f"hoặc tất cả dòng bị filter. Vui lòng kiểm tra file: {data_file}"
+        )
+
     if isinstance(limit, int) and limit > 0 and len(df) > limit:
-        df = df.tail(limit).reset_index(drop=True)
-    
+        df = df.tail(limit)
+
     # Lưu vào cache nếu save_cache=True
     if save_cache:
-        df.to_csv(cache_path, index=False)
+        df.write_csv(cache_path)
         print(f"💾 Đã lưu cache vào: {cache_path}")
-    
+
     print(f"✅ Đã tải {len(df)} dòng dữ liệu")
-    print(f"   Thời gian: {df['datetime'].iloc[0]} đến {df['datetime'].iloc[-1]}")
+    print(f"   Thời gian: {df.select('datetime').row(0)[0]} đến {df.select('datetime').row(-1)[0]}")
     
     return df
 

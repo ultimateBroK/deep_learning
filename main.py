@@ -211,8 +211,11 @@ def main():
     # Thông tin dữ liệu (đưa vào report)
     data_rows = len(df)
     try:
-        data_start = str(df["datetime"].iloc[0])
-        data_end = str(df["datetime"].iloc[-1])
+        if data_rows > 0:
+            data_start = str(df.select("datetime").row(0)[0])
+            data_end = str(df.select("datetime").row(-1)[0])
+        else:
+            data_start, data_end = None, None
     except Exception:
         data_start, data_end = None, None
     

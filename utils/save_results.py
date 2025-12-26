@@ -51,7 +51,7 @@ def _to_jsonable(obj):
     if isinstance(obj, (list, tuple)):
         return [_to_jsonable(v) for v in obj]
 
-    # Thử cast số kiểu lạ (int64/float64 từ pandas có thể rơi vào đây)
+    # Thử cast số kiểu lạ (int64/float64 từ polars có thể rơi vào đây)
     try:
         if hasattr(obj, "item"):
             return obj.item()

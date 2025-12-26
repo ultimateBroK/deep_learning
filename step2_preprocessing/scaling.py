@@ -19,7 +19,7 @@ Lợi ích:
 """
 
 import numpy as np
-import pandas as pd
+import polars as pl
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
@@ -148,7 +148,7 @@ def _scale_y(scaler: DataScaler, y: np.ndarray) -> np.ndarray:
 
 
 def prepare_data_for_lstm(
-    df: pd.DataFrame,
+    df: pl.DataFrame,
     features: list = ["close"],
     window_size: int = 60,
     scaler_type: str = "minmax"
@@ -176,7 +176,7 @@ def prepare_data_for_lstm(
     from .create_windows import create_windows, split_data
     
     # 1. Chọn các features cần dùng
-    data = df[features].values
+    data = df.select(features).to_numpy()
     
     print(f"📦 Dữ liệu gốc shape: {data.shape}")
 

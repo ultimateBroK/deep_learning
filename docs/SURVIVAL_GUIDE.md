@@ -286,7 +286,7 @@ print_sample_predictions(y_true, y_pred, n_samples=10)
 
 ## Troubleshooting
 
-### ❌ Lỗi 1: "No module named 'tensorflow'" (hoặc pandas/numpy)
+### ❌ Lỗi 1: "No module named 'tensorflow'" (hoặc polars/numpy)
 
 **Nguyên nhân**: Chưa cài dependencies
 
