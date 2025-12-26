@@ -14,7 +14,38 @@ Lưu ý:
 """
 
 import os
+import random
+
+import numpy as np
 import tensorflow as tf
+
+
+def set_random_seed(seed: int, deterministic: bool = False) -> None:
+    """
+    Cố định ngẫu nhiên để kết quả chạy có thể tái lập.
+
+    Args:
+        seed: Số seed (ví dụ 42). Nếu seed < 0 thì không làm gì.
+        deterministic: Cố gắng bật deterministic ops (best-effort, tuỳ môi trường/TF version).
+    """
+    if seed is None or seed < 0:
+        return
+
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+
+    try:
+        tf.keras.utils.set_random_seed(seed)
+    except Exception:
+        tf.random.set_seed(seed)
+
+    if deterministic:
+        os.environ.setdefault("TF_DETERMINISTIC_OPS", "1")
+        try:
+            tf.config.experimental.enable_op_determinism()
+        except Exception:
+            pass
 
 
 def configure_tensorflow_runtime(
@@ -48,14 +79,14 @@ def configure_tensorflow_runtime(
         print(f"⚠️  Không thể cấu hình visible GPU devices: {e}")
     
     # In thông tin cấu hình
-    print(f"{'='*60}")
-    print(f"⚙️  CẤU HÌNH TENSORFLOW RUNTIME")
-    print(f"{'='*60}")
+    print("=" * 60)
+    print("⚙️  CẤU HÌNH TENSORFLOW RUNTIME")
+    print("=" * 60)
     print(f"Intra-op threads: {intra_op_threads}")
     print(f"Inter-op threads: {inter_op_threads}")
     print(f"XLA enabled: {enable_xla}")
-    print(f"CPU only: True")
-    print(f"{'='*60}\n")
+    print("CPU only: True")
+    print("=" * 60 + "\n")
 
 
 def get_gpu_info():
@@ -96,9 +127,9 @@ def print_tensorflow_info():
     """
     In thông tin về TensorFlow và runtime
     """
-    print(f"\n{'='*60}")
-    print(f"📋 THÔNG TIN TENSORFLOW")
-    print(f"{'='*60}")
+    print("\n" + "=" * 60)
+    print("📋 THÔNG TIN TENSORFLOW")
+    print("=" * 60)
     print(f"TensorFlow version: {tf.__version__}")
     print(f"Keras version: {tf.keras.__version__}")
     print(f"Built with CUDA: {tf.test.is_built_with_cuda()}")
@@ -107,7 +138,7 @@ def print_tensorflow_info():
     # CPU threads
     print(f"Intra-op threads: {tf.config.threading.get_intra_op_parallelism_threads()}")
     print(f"Inter-op threads: {tf.config.threading.get_inter_op_parallelism_threads()}")
-    print(f"{'='*60}\n")
+    print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":

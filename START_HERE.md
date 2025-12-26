@@ -43,10 +43,10 @@ Mở file `notebooks/run_complete.ipynb` và chạy từng cell theo thứ tự.
 uv sync
 
 # Chạy với cấu hình mặc định
-uv run python main.py
+uv run main.py
 
 # Chạy với tham số tùy chỉnh
-uv run python main.py --epochs 20 --limit 1500
+uv run main.py --epochs 20 --limit 1500
 ```
 
 ---
@@ -118,12 +118,12 @@ Sau đó mở `notebooks/run_complete.ipynb`
 
 ```bash
 # Cấu hình mặc định
-uv run python main.py
+uv run main.py
 
 # Tùy chỉnh tham số
-uv run python main.py --epochs 30 --limit 2000
-uv run python main.py --timeframe 4h --window 30
-uv run python main.py --refresh-cache
+uv run main.py --epochs 30 --limit 2000
+uv run main.py --timeframe 4h --window 30
+uv run main.py --refresh-cache
 ```
 
 **Các tham số quan trọng:**
@@ -207,19 +207,19 @@ Nếu project có quá nhiều file cache hoặc reports cũ:
 
 ```bash
 # Dọn tất cả (cache + reports cũ, giữ lại 5 file reports mới nhất)
-uv run python clean.py
+uv run w
 
 # Chỉ dọn cache và checkpoint
-uv run python clean.py --cache
+uv run clean.py --cache
 
 # Chỉ dọn reports cũ (giữ lại 10 folder mới nhất)
-uv run python clean.py --reports --keep 10
+uv run clean.py --reports --keep 10
 
 # Xóa cache dữ liệu (chỉ file cũ > 30 ngày)
-uv run python clean.py --data-cache
+uv run clean.py --data-cache
 
 # Xóa TẤT CẢ cache dữ liệu
-uv run python clean.py --data-cache-force
+uv run clean.py --data-cache-force
 ```
 
 ---
@@ -233,6 +233,6 @@ Chọn 1 trong 2 cách:
    → Mở `notebooks/run_complete.ipynb`
 
 2. **Nếu bạn thích nhanh gọn:**
-   → Chạy CLI: `uv run python main.py --epochs 20 --limit 1500`
+   → Chạy CLI: `uv run main.py --epochs 20 --limit 1500`
 
 **Chúc bạn thành công! 🚀**

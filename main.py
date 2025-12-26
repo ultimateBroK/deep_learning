@@ -19,12 +19,7 @@ from pathlib import Path
 # Thêm thư mục gốc vào path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from step1_data import fetch_binance_data
-from step2_preprocessing import prepare_data_for_lstm
-from step3_model import build_bilstm_model, print_model_summary
-from step4_training import train_model, evaluate_model, print_sample_predictions, calculate_direction_accuracy
-from step5_visualization import plot_training_history, plot_predictions, plot_all_in_one
-from utils import configure_tensorflow_runtime, print_tensorflow_info, create_results_folder, save_markdown_report, save_config, save_metrics
+# Lưu ý: không import các module "nặng" ở top-level để `python main.py --help` chạy gọn và nhanh.
 
 
 def parse_args():
@@ -117,6 +112,13 @@ Ví dụ:
         default=12,
         help='CPU threads cho operations (mặc định: 12)'
     )
+
+    parser.add_argument(
+        '--seed',
+        type=int,
+        default=42,
+        help='Cố định ngẫu nhiên để tái lập kết quả (mặc định: 42, <0 = không set)'
+    )
     
     return parser.parse_args()
 
@@ -125,12 +127,35 @@ def main():
     """Hàm chính để chạy project"""
     # Parse args
     args = parse_args()
+
+    # Import các module "nặng" sau khi parse args để:
+    # - `python main.py --help` chạy nhanh và không in log TensorFlow
+    from step1_data import fetch_binance_data
+    from step2_preprocessing import prepare_data_for_lstm
+    from step3_model import build_bilstm_model, print_model_summary
+    from step4_training import (
+        train_model,
+        evaluate_model,
+        print_sample_predictions,
+        calculate_direction_accuracy,
+    )
+    from step5_visualization import plot_training_history, plot_predictions, plot_all_in_one
+    from utils import (
+        configure_tensorflow_runtime,
+        print_tensorflow_info,
+        create_results_folder,
+        save_markdown_report,
+        save_config,
+        save_metrics,
+        set_random_seed,
+    )
     
     print("\n" + "="*70)
     print(" " * 15 + "DỰ BÁO GIÁ BITCOIN VỚI BiLSTM")
     print("="*70)
     
     # Cấu hình TensorFlow
+    set_random_seed(args.seed, deterministic=True)
     configure_tensorflow_runtime(
         intra_op_threads=args.intra_threads,
         inter_op_threads=2,
@@ -269,7 +294,8 @@ def main():
         'dropout_rate': args.dropout,
         'epochs': args.epochs,
         'batch_size': args.batch_size,
-        'intra_threads': args.intra_threads
+        'intra_threads': args.intra_threads,
+        'seed': args.seed,
     }
     
     plots_dict = {
