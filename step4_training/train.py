@@ -19,11 +19,10 @@ Callback là gì?
 - ReduceLROnPlateau: Giảm learning rate khi model không còn tiến bộ
 """
 
-import os
 from pathlib import Path
+import time
 import numpy as np
-from typing import Dict, Tuple
-import tensorflow as tf
+from typing import Dict
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
@@ -97,17 +96,18 @@ def train_model(
     
     callbacks = [checkpoint_callback, early_stop_callback, reduce_lr_callback]
     
-    print(f"\n{'='*60}")
-    print(f"🚀 BẮT ĐẦU TRAINING")
-    print(f"{'='*60}")
+    print("\n" + "=" * 60)
+    print("🚀 BẮT ĐẦU TRAINING")
+    print("=" * 60)
     print(f"Epochs: {epochs}")
     print(f"Batch size: {batch_size}")
     print(f"Train samples: {len(X_train)}")
     print(f"Val samples: {len(X_val)}")
     print(f"Checkpoint: {checkpoint_path}")
-    print(f"{'='*60}\n")
+    print("=" * 60 + "\n")
     
     # Training
+    t0 = time.perf_counter()
     history = model.fit(
         X_train, y_train,
         validation_data=(X_val, y_val),
@@ -116,22 +116,26 @@ def train_model(
         callbacks=callbacks,
         verbose=1
     )
+    train_seconds = time.perf_counter() - t0
     
     # Tìm epoch có val_loss thấp nhất
     best_epoch = np.argmin(history.history['val_loss']) + 1  # +1 vì epoch bắt đầu từ 1
     best_val_loss = min(history.history['val_loss'])
     
-    print(f"\n{'='*60}")
-    print(f"✅ TRAINING HOÀN THÀNH")
-    print(f"{'='*60}")
+    print("\n" + "=" * 60)
+    print("✅ TRAINING HOÀN THÀNH")
+    print("=" * 60)
     print(f"Best epoch: {best_epoch}/{epochs}")
     print(f"Best val_loss: {best_val_loss:.6f}")
     print(f"Best val_mae: {history.history['val_mae'][best_epoch-1]:.6f}")
-    print(f"{'='*60}\n")
+    print(f"Training time: {train_seconds:.2f}s")
+    print("=" * 60 + "\n")
     
     return {
         "history": history,
         "best_epoch": best_epoch,
+        "best_val_loss": best_val_loss,
+        "train_seconds": train_seconds,
         "callbacks": callbacks,
         "checkpoint_path": checkpoint_path
     }

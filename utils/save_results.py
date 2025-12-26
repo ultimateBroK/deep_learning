@@ -13,11 +13,73 @@ Kết quả được lưu:
 3. Model: File .keras để load lại sau
 """
 
-import os
 from pathlib import Path
 from datetime import datetime
 from typing import Dict
 import json
+
+
+def _to_jsonable(obj):
+    """
+    Convert các kiểu không JSON-serializable (numpy scalar/array, Path, ...) về kiểu cơ bản.
+    """
+    # Local import để tránh ép dependency nếu không cần
+    try:
+        import numpy as np
+    except Exception:  # pragma: no cover
+        np = None
+
+    if obj is None:
+        return None
+
+    if isinstance(obj, Path):
+        return str(obj)
+
+    if np is not None:
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, (np.integer,)):
+            return int(obj)
+        if isinstance(obj, (np.floating,)):
+            return float(obj)
+        if isinstance(obj, (np.bool_,)):
+            return bool(obj)
+
+    if isinstance(obj, dict):
+        return {str(k): _to_jsonable(v) for k, v in obj.items()}
+
+    if isinstance(obj, (list, tuple)):
+        return [_to_jsonable(v) for v in obj]
+
+    # Thử cast số kiểu lạ (int64/float64 từ pandas có thể rơi vào đây)
+    try:
+        if hasattr(obj, "item"):
+            return obj.item()
+    except Exception:
+        pass
+
+    return obj
+
+
+def _md_table_kv(rows: list[tuple[str, str]]) -> str:
+    """Tạo markdown table dạng key/value."""
+    out = ["| Tham số / Parameter | Giá trị / Value |", "|---|---|"]
+    for k, v in rows:
+        out.append(f"| {k} | {v} |")
+    return "\n".join(out) + "\n"
+
+
+def _fmt(v) -> str:
+    if v is None:
+        return "-"
+    return str(v)
+
+
+def _fmt_money(v) -> str:
+    try:
+        return f"${float(v):.2f}"
+    except Exception:
+        return _fmt(v)
 
 
 def create_results_folder(base_path: str = None, run_type: str = "main") -> Path:
@@ -65,44 +127,84 @@ def save_markdown_report(
     """
     report_path = folder_path / f"results_BiLSTM_{folder_path.name.replace('BiLSTM_', '')}.md"
     
-    # Tạo nội dung Markdown
-    content = f"""# Kết quả dự đoán giá Bitcoin - BiLSTM
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    content = f"# Kết quả dự đoán giá Bitcoin - BiLSTM / Bitcoin Price Prediction Results (BiLSTM)\n\n**Timestamp:** {now_str}\n\n---\n\n"
 
-**Timestamp:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    # =====================
+    # Tổng quan / cấu hình
+    # =====================
+    content += "## ⚙️ Cấu hình & dữ liệu / Config & Data\n\n"
+    kv_rows: list[tuple[str, str]] = [
+        ("Symbol", _fmt(config.get("symbol", "BTC/USDT"))),
+        ("Timeframe", _fmt(config.get("timeframe", "1d"))),
+        ("Data limit", _fmt(config.get("limit", 1500))),
+        ("Data rows", _fmt(config.get("data_rows"))),
+        ("Date range", f"{_fmt(config.get('data_start'))} → {_fmt(config.get('data_end'))}"),
+        ("Features", _fmt(config.get("features"))),
+        ("Scaler", _fmt(config.get("scaler_type"))),
+        ("Window size", _fmt(config.get("window_size", 60))),
+        ("Split sizes (train/val/test)", f"{_fmt(config.get('train_samples'))} / {_fmt(config.get('val_samples'))} / {_fmt(config.get('test_samples'))}"),
+        ("Seed", _fmt(config.get("seed"))),
+        ("LSTM units", _fmt(config.get("lstm_units", [64, 32]))),
+        ("Dropout rate", _fmt(config.get("dropout_rate", 0.2))),
+        ("Epochs", _fmt(config.get("epochs", 20))),
+        ("Batch size", _fmt(config.get("batch_size", 32))),
+        ("Best epoch", _fmt(config.get("best_epoch"))),
+        ("Best val_loss", _fmt(config.get("best_val_loss"))),
+        ("Training time (s)", _fmt(config.get("train_seconds"))),
+    ]
+    content += _md_table_kv(kv_rows)
+    content += "\n---\n\n"
 
----
+    # =========
+    # Metrics
+    # =========
+    content += "## 📊 Metrics / Chỉ số\n\n"
+    metric_rows: list[tuple[str, str]] = [
+        ("MAE (Sai số trung bình)", _fmt_money(metrics.get("mae", 0))),
+        ("RMSE (Căn bậc 2 sai số)", _fmt_money(metrics.get("rmse", 0))),
+        ("MAPE (Sai số phần trăm)", f"{float(metrics.get('mape', 0)):.2f}%" if isinstance(metrics.get("mape", 0), (int, float)) else _fmt(metrics.get("mape"))),
+    ]
+    if "direction_accuracy" in metrics:
+        try:
+            metric_rows.append(("Độ chính xác xu hướng", f"{float(metrics['direction_accuracy']) * 100:.2f}%"))
+        except Exception:
+            metric_rows.append(("Độ chính xác xu hướng", _fmt(metrics.get("direction_accuracy"))))
+    content += _md_table_kv(metric_rows)
 
-## 📊 Metrics
+    # ==================
+    # Ví dụ dự đoán
+    # ==================
+    y_true = metrics.get("y_true")
+    y_pred = metrics.get("predictions")
+    if y_true is not None and y_pred is not None:
+        try:
+            import numpy as np
 
-| Metric | Giá trị |
-|--------|---------|
-| MAE (Sai số trung bình) | ${metrics.get('mae', 0):.2f} |
-| RMSE (Căn bậc 2 sai số) | ${metrics.get('rmse', 0):.2f} |
-| MAPE (Sai số phần trăm) | {metrics.get('mape', 0):.2f}% |
+            y_true_arr = np.array(y_true).reshape(-1)
+            y_pred_arr = np.array(y_pred).reshape(-1)
+            n = int(min(10, len(y_true_arr), len(y_pred_arr)))
 
----
-
-## ⚙️ Cấu hình
-
-| Tham số | Giá trị |
-|---------|---------|
-| Symbol | {config.get('symbol', 'BTC/USDT')} |
-| Timeframe | {config.get('timeframe', '1d')} |
-| Data limit | {config.get('limit', 1500)} |
-| Window size | {config.get('window_size', 60)} |
-| Epochs | {config.get('epochs', 20)} |
-| LSTM units | {config.get('lstm_units', [64, 32])} |
-| Dropout rate | {config.get('dropout_rate', 0.2)} |
-
----
-
-## 📈 Training History
-"""
+            content += "\n---\n\n## 🔍 Ví dụ dự đoán (10 mẫu đầu) / Sample predictions (first 10)\n\n"
+            content += "| # | Thực tế / Actual | Dự đoán / Pred | Sai số / Error | % Sai số / %Err |\n|---:|---:|---:|---:|---:|\n"
+            for i in range(n):
+                t = float(y_true_arr[i])
+                p = float(y_pred_arr[i])
+                err = abs(t - p)
+                pct = (err / (t + 1e-8)) * 100
+                content += f"| {i+1} | ${t:.2f} | ${p:.2f} | ${err:.2f} | {pct:.2f}% |\n"
+        except Exception:
+            # Không làm report fail chỉ vì phần sample
+            pass
     
     # Thêm training history nếu có
     if history:
         final_epoch = len(history.get('loss', []))
-        content += f"""
+        content += """
+---
+
+## 📈 Training History / Lịch sử huấn luyện
+
 | Epoch | Train Loss | Val Loss | Train MAE | Val MAE |
 |-------|------------|----------|-----------|---------|
 """
@@ -111,7 +213,7 @@ def save_markdown_report(
     
     # Thêm plots nếu có
     if plots:
-        content += "\n---\n\n## 📊 Biểu đồ\n\n"
+        content += "\n---\n\n## 📊 Biểu đồ / Plots\n\n"
         if 'training_history' in plots:
             content += f"- [Training History](training_history_{plots['training_history']}.png)\n"
         if 'predictions' in plots:
@@ -140,7 +242,7 @@ def save_config(folder_path: Path, config: Dict):
     config_path = folder_path / "config.json"
     
     with open(config_path, 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2, ensure_ascii=False)
+        json.dump(_to_jsonable(config), f, indent=2, ensure_ascii=False)
     
     print(f"💾 Đã lưu cấu hình: {config_path}")
 

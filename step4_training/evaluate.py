@@ -22,7 +22,7 @@ Các metrics:
 """
 
 import numpy as np
-from typing import Dict, Tuple
+from typing import Dict
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
@@ -74,13 +74,13 @@ def evaluate_model(
     # MAPE (tránh chia cho 0)
     mape = np.mean(np.abs((y_true - y_pred) / (y_true + 1e-8))) * 100
     
-    print(f"\n{'='*60}")
-    print(f"📊 KẾT QUẢ ĐÁNH GIÁ TRÊN TEST SET")
-    print(f"{'='*60}")
-    print(f"MAE:  ${mae:.2f}  (Sai số trung bình tuyệt đối)")
-    print(f"RMSE: ${rmse:.2f}  (Căn bậc 2 sai số bình phương)")
-    print(f"MAPE: {mape:.2f}%  (Sai số phần trăm trung bình)")
-    print(f"{'='*60}\n")
+    print("\n" + "=" * 60)
+    print("📊 KẾT QUẢ ĐÁNH GIÁ TRÊN TEST SET / TEST SET EVALUATION")
+    print("=" * 60)
+    print(f"MAE:  ${mae:.2f}  (Sai số trung bình tuyệt đối / Mean Absolute Error)")
+    print(f"RMSE: ${rmse:.2f}  (Căn bậc 2 sai số bình phương / Root Mean Squared Error)")
+    print(f"MAPE: {mape:.2f}%  (Sai số phần trăm trung bình / Mean Absolute Percentage Error)")
+    print("=" * 60 + "\n")
     
     result = {
         "mae": mae,
@@ -111,11 +111,11 @@ def print_sample_predictions(
     """
     n_samples = min(n_samples, len(y_true))
     
-    print(f"\n{'='*60}")
-    print(f"VÍ DỤ DỰ ĐOÁN (đầu {n_samples} mẫu)")
-    print(f"{'='*60}")
-    print(f"{'STT':<5} {'Thực tế':<15} {'Dự đoán':<15} {'Sai số':<15} {'% Sai số':<10}")
-    print(f"{'-'*60}")
+    print("\n" + "=" * 60)
+    print(f"VÍ DỤ DỰ ĐOÁN (đầu {n_samples} mẫu) / SAMPLE PREDICTIONS (first {n_samples})")
+    print("=" * 60)
+    print(f"{'STT/#':<5} {'Thực tế/Actual':<15} {'Dự đoán/Pred':<15} {'Sai số/Error':<15} {'% Sai số/%Err':<12}")
+    print("-" * 60)
     
     for i in range(n_samples):
         true_val = y_true[i]
@@ -125,7 +125,7 @@ def print_sample_predictions(
         
         print(f"{i+1:<5} ${true_val:<13.2f} ${pred_val:<13.2f} ${error:<13.2f} {pct_error:<9.2f}%")
     
-    print(f"{'='*60}\n")
+    print("=" * 60 + "\n")
 
 
 def calculate_direction_accuracy(
@@ -155,7 +155,7 @@ def calculate_direction_accuracy(
     # Tính độ chính xác
     accuracy = np.mean(true_direction == pred_direction)
     
-    print(f"📈 Độ chính xác xu hướng: {accuracy*100:.2f}%")
+    print(f"📈 Độ chính xác xu hướng / Direction accuracy: {accuracy*100:.2f}%")
     
     return accuracy
 

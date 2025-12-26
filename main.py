@@ -176,6 +176,14 @@ def main():
         limit=args.limit,
         save_cache=not args.refresh_cache
     )
+
+    # Thông tin dữ liệu (đưa vào report)
+    data_rows = len(df)
+    try:
+        data_start = str(df["datetime"].iloc[0])
+        data_end = str(df["datetime"].iloc[-1])
+    except Exception:
+        data_start, data_end = None, None
     
     # ========================================
     # BƯỚC 2: XỬ LÝ DỮ LIỆU
@@ -198,6 +206,12 @@ def main():
     X_test = data_dict['X_test']
     y_test = data_dict['y_test']
     scaler = data_dict['scaler']
+
+    # Thông tin split (đưa vào report)
+    train_samples = len(X_train)
+    val_samples = len(X_val)
+    test_samples = len(X_test)
+    scaler_type = "minmax"
     
     # ========================================
     # BƯỚC 3: XÂY DỰNG MODEL
@@ -235,6 +249,10 @@ def main():
     )
     
     history = train_result['history']
+    best_epoch = train_result.get("best_epoch")
+    best_val_loss = train_result.get("best_val_loss")
+    train_seconds = train_result.get("train_seconds")
+    checkpoint_path = str(train_result.get("checkpoint_path")) if train_result.get("checkpoint_path") is not None else None
     
     # ========================================
     # BƯỚC 5: ĐÁNH GIÁ & VẼ BIỂU ĐỒ
@@ -259,7 +277,8 @@ def main():
     print_sample_predictions(y_true, y_pred, n_samples=10)
     
     # Tính độ chính xác xu hướng
-    calculate_direction_accuracy(y_true, y_pred)
+    direction_accuracy = calculate_direction_accuracy(y_true, y_pred)
+    eval_result["direction_accuracy"] = float(direction_accuracy)
     
     # ========================================
     # LƯU KẾT QUẢ
@@ -288,14 +307,25 @@ def main():
         'symbol': args.symbol,
         'timeframe': args.timeframe,
         'limit': args.limit,
+        'data_rows': data_rows,
+        'data_start': data_start,
+        'data_end': data_end,
         'window_size': args.window,
         'features': args.features,
+        'scaler_type': scaler_type,
+        'train_samples': train_samples,
+        'val_samples': val_samples,
+        'test_samples': test_samples,
         'lstm_units': args.lstm_units,
         'dropout_rate': args.dropout,
         'epochs': args.epochs,
         'batch_size': args.batch_size,
         'intra_threads': args.intra_threads,
         'seed': args.seed,
+        'best_epoch': best_epoch,
+        'best_val_loss': best_val_loss,
+        'train_seconds': train_seconds,
+        'checkpoint_path': checkpoint_path,
     }
     
     plots_dict = {
