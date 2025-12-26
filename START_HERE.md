@@ -58,8 +58,8 @@ Deep_learning/
 ├── START_HERE.md              # ⭐ ĐỌC FILE NÀY TRƯỚC!
 │
 ├── step1_data/                # BƯỚC 1: Lấy dữ liệu
-│   ├── fetch_data.py          # Tải dữ liệu từ Binance
-│   └── cache/                 # Dữ liệu đã tải (CSV)
+│   ├── fetch_data.py          # Đọc dữ liệu từ CSV local (data/)
+│   └── cache/                 # Cache CSV đã chuẩn hoá (optional)
 │
 ├── step2_preprocessing/        # BƯỚC 2: Xử lý dữ liệu
 │   ├── create_windows.py      # Tạo windows (sequences)
@@ -127,11 +127,12 @@ uv run main.py --refresh-cache
 ```
 
 **Các tham số quan trọng:**
-- `--timeframe`: `1d`, `4h`, `1h` (mặc định: `1d`)
-- `--limit`: Số nến lấy từ Binance (mặc định: `1500`)
+- `--data-path`: CSV mặc định: `data/btc_1d_data_2018_to_2025.csv`
+- `--timeframe`: `1d`, `4h` (mặc định: `1d`)
+- `--limit`: Lấy N dòng cuối trong CSV (mặc định: `1500`)
 - `--window`: Số nến nhìn lại (mặc định: `60`)
 - `--epochs`: Số epochs (mặc định: `20`)
-- `--refresh-cache`: Tải lại dữ liệu từ Binance
+- `--refresh-cache`: Bỏ qua cache normalized, đọc lại CSV gốc
 
 ---
 

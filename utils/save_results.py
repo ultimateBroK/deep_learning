@@ -135,9 +135,9 @@ def save_markdown_report(
     # =====================
     content += "## ⚙️ Cấu hình & dữ liệu / Config & Data\n\n"
     kv_rows: list[tuple[str, str]] = [
-        ("Symbol", _fmt(config.get("symbol", "BTC/USDT"))),
+        ("Source CSV", _fmt(config.get("data_path"))),
         ("Timeframe", _fmt(config.get("timeframe", "1d"))),
-        ("Data limit", _fmt(config.get("limit", 1500))),
+        ("Rows (tail)", _fmt(config.get("limit", 1500))),
         ("Data rows", _fmt(config.get("data_rows"))),
         ("Date range", f"{_fmt(config.get('data_start'))} → {_fmt(config.get('data_end'))}"),
         ("Features", _fmt(config.get("features"))),
@@ -322,7 +322,7 @@ if __name__ == "__main__":
     
     # Test save markdown
     config = {
-        'symbol': 'BTC/USDT',
+        'data_path': 'data/btc_1d_data_2018_to_2025.csv',
         'timeframe': '1d',
         'limit': 1500,
         'window_size': 60,

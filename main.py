@@ -15,6 +15,7 @@ Cách dùng:
 import argparse
 import sys
 from pathlib import Path
+import re
 
 # Thêm thư mục gốc vào path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -37,28 +38,28 @@ Ví dụ:
     
     # Data args
     parser.add_argument(
-        '--symbol',
+        '--data-path',
         type=str,
-        default='BTC/USDT',
-        help='Cặp giao dịch (mặc định: BTC/USDT)'
+        default=None,
+        help='Đường dẫn file CSV (nếu bỏ trống sẽ chọn theo --timeframe trong thư mục data/)'
     )
     parser.add_argument(
         '--timeframe',
         type=str,
         default='1d',
-        choices=['1d', '4h', '1h'],
-        help='Khung thời gian (mặc định: 1d)'
+        choices=['1d', '4h'],
+        help='Timeframe (dùng để chọn file mặc định nếu không set --data-path) (mặc định: 1d)'
     )
     parser.add_argument(
         '--limit',
         type=int,
         default=1500,
-        help='Số nến lấy từ Binance (mặc định: 1500)'
+        help='Lấy N dòng cuối trong file CSV (mặc định: 1500, <=0 = lấy tất cả)'
     )
     parser.add_argument(
         '--refresh-cache',
         action='store_true',
-        help='Tải lại dữ liệu từ Binance (không dùng cache)'
+        help='Đọc lại từ CSV gốc (bỏ qua cache đã chuẩn hoá)'
     )
     
     # Preprocessing args
@@ -123,6 +124,30 @@ Ví dụ:
     return parser.parse_args()
 
 
+def _infer_timeframe_from_filename(path_str: str | None) -> str | None:
+    """
+    Infer timeframe dựa vào tên file, ví dụ:
+    - btc_1d_data_2018_to_2025.csv -> 1d
+    - btc_4h_data_2018_to_2025.csv -> 4h
+    """
+    if not path_str:
+        return None
+    name = Path(path_str).name.lower()
+    if re.search(r"(?:^|_)4h(?:_|\\.)", name) or "4h" in name:
+        return "4h"
+    if re.search(r"(?:^|_)1d(?:_|\\.)", name) or "1d" in name:
+        return "1d"
+    return None
+
+
+def _default_data_path_from_timeframe(timeframe: str) -> str:
+    tf = (timeframe or "1d").lower()
+    base = Path(__file__).parent / "data"
+    if tf == "4h":
+        return str(base / "btc_4h_data_2018_to_2025.csv")
+    return str(base / "btc_1d_data_2018_to_2025.csv")
+
+
 def main():
     """Hàm chính để chạy project"""
     # Parse args
@@ -167,12 +192,18 @@ def main():
     # BƯỚC 1: LẤY DỮ LIỆU
     # ========================================
     print("\n" + "="*70)
-    print("BƯỚC 1: LẤY DỮ LIỆU TỪ BINANCE")
+    print("BƯỚC 1: ĐỌC DỮ LIỆU CSV (LOCAL)")
     print("="*70 + "\n")
+
+    data_path = args.data_path or _default_data_path_from_timeframe(args.timeframe)
+    inferred_tf = _infer_timeframe_from_filename(data_path)
+    effective_tf = inferred_tf or args.timeframe
+    print(f"📄 Data file: {data_path}")
+    print(f"🕒 Timeframe (từ tên file): {effective_tf}\n")
     
     df = fetch_binance_data(
-        symbol=args.symbol,
-        timeframe=args.timeframe,
+        data_path=data_path,
+        timeframe=effective_tf,
         limit=args.limit,
         save_cache=not args.refresh_cache
     )
@@ -304,8 +335,8 @@ def main():
     
     # Lưu báo cáo
     config_dict = {
-        'symbol': args.symbol,
-        'timeframe': args.timeframe,
+        'data_path': data_path,
+        'timeframe': effective_tf,
         'limit': args.limit,
         'data_rows': data_rows,
         'data_start': data_start,

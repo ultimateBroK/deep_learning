@@ -23,9 +23,9 @@ Hiểu quy trình tổng thể của chương trình qua sơ đồ chi tiết.
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  BƯỚC 1: LẤY DỮ LIỆU TỪ BINANCE                                 │
-│  • Tải data từ Binance API                                      │
-│  • Lưu vào cache (CSV)                                          │
+│  BƯỚC 1: ĐỌC DỮ LIỆU CSV (LOCAL)                                 │
+│  • Đọc data từ file CSV trong thư mục data/                      │
+│  • Cache (CSV đã chuẩn hoá) (optional)                           │
 │  • Trả về DataFrame với: datetime, open, high, low, close, vol  │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
@@ -125,7 +125,7 @@ Hiểu quy trình tổng thể của chương trình qua sơ đồ chi tiết.
 
 ## Flow Chi Tiết Từng Bước
 
-### BƯỚC 1: LẤY DỮ LIỆU TỪ BINANCE
+### BƯỚC 1: ĐỌC DỮ LIỆU CSV (LOCAL)
 
 ```
 fetch_binance_data()
@@ -139,26 +139,26 @@ fetch_binance_data()
    ┌───┴─────────────┐
    │ Có              │ Không
    ▼                 ▼       
-┌───────┐   ┌──────────────────┐
-│ Đọc   │   │ Kết nối Binance  │
-│ cache │   │ API              │
-└───────┘   └────────┬─────────┘
-                     ▼
-            ┌──────────────────┐
-            │ Lấy OHLCV data   │
-            │ (limit candles)  │
-            └────────┬─────────┘
-                     ▼
-            ┌──────────────────┐
-            │ Chuyển thành     │
-            │ DataFrame        │
-            └────────┬─────────┘
-                     ▼
-            ┌──────────────────┐
-            │ Lưu cache (CSV)  │
-            └────────┬─────────┘
-                     │
-                     ▼
+┌──────────────┐   ┌──────────────────────┐
+│ Đọc cache    │   │ Đọc CSV gốc (data/)  │
+│ normalized   │   └──────────┬───────────┘
+└──────┬───────┘              ▼
+       │              ┌──────────────────────┐
+       │              │ Chuẩn hoá cột        │
+       │              │ (Open time→datetime, │
+       │              │  Open/High/... )     │
+       │              └──────────┬───────────┘
+       │                         ▼
+       │              ┌──────────────────────┐
+       │              │ Lấy N dòng cuối      │
+       │              │ (limit, optional)    │
+       │              └──────────┬───────────┘
+       │                         ▼
+       │              ┌──────────────────────┐
+       │              │ Lưu cache normalized │
+       │              └──────────┬───────────┘
+       │                         │
+       ▼                         ▼
               ┌───────────┐
               │ Trả về df │
               └───────────┘
@@ -376,7 +376,7 @@ evaluate_model() + plot_all()
 ## Data Flow
 
 ```
-Raw Data (Binance)
+Raw Data (CSV local)
         │
         ▼
    DataFrame

@@ -6,7 +6,7 @@ Giải thích chi tiết từng bước + Troubleshooting cho các vấn đề t
 
 ## 📋 Chỉ Mục
 
-- [Bước 1: Lấy dữ liệu từ Binance](#bước-1-lấy-dữ-liệu-từ-binance)
+- [Bước 1: Đọc dữ liệu từ CSV (local)](#bước-1-đọc-dữ-liệu-từ-csv-local)
 - [Bước 2: Xử lý dữ liệu](#bước-2-xử-lý-dữ-liệu)
 - [Bước 3: Xây dựng model BiLSTM](#bước-3-xây-dựng-model-bilstm)
 - [Bước 4: Training model](#bước-4-training-model)
@@ -15,20 +15,20 @@ Giải thích chi tiết từng bước + Troubleshooting cho các vấn đề t
 
 ---
 
-## Bước 1: Lấy Dữ Liệu Từ Binance
+## Bước 1: Đọc Dữ Liệu Từ CSV (Local)
 
 ### Giải thích
-- **fetch_binance_data()**: Tải dữ liệu giá từ Binance API
-- **Cache**: Lưu dữ liệu vào file CSV để lần sau không phải tải lại
-- **Symbol**: Cặp giao dịch (BTC/USDT, ETH/USDT, v.v.)
-- **Timeframe**: Khung thời gian (1d = 1 ngày, 4h = 4 giờ, 1h = 1 giờ)
+- **fetch_binance_data()**: (giữ tên cũ cho tương thích) nhưng thực tế là **đọc file CSV local**
+- **Dữ liệu mặc định**: `data/btc_1d_data_2018_to_2025.csv`
+- **Cache**: Lưu file CSV đã chuẩn hoá (datetime/open/high/low/close/volume) để lần sau đọc nhanh hơn
+- **Timeframe**: Chỉ dùng để chọn file mặc định nếu không set `data_path` (1d/4h)
 
 ### Các tham số
 | Tham số | Giải thích | Mặc định |
 |---------|------------|----------|
-| `symbol` | Cặp giao dịch | BTC/USDT |
-| `timeframe` | Khung thời gian | 1d |
-| `limit` | Số nến muốn lấy | 1500 |
+| `data_path` | Đường dẫn CSV | data/btc_1d_data_2018_to_2025.csv |
+| `timeframe` | Dùng để chọn file mặc định | 1d |
+| `limit` | Lấy N dòng cuối của CSV | 1500 |
 | `save_cache` | Có lưu cache không | True |
 
 ### Dữ liệu trả về
@@ -45,7 +45,7 @@ DataFrame với các cột:
 from step1_data.fetch_data import fetch_binance_data
 
 df = fetch_binance_data(
-    symbol="BTC/USDT",
+    data_path="data/btc_1d_data_2018_to_2025.csv",
     timeframe="1d",
     limit=1500
 )
@@ -286,7 +286,7 @@ print_sample_predictions(y_true, y_pred, n_samples=10)
 
 ## Troubleshooting
 
-### ❌ Lỗi 1: "No module named 'ccxt'"
+### ❌ Lỗi 1: "No module named 'tensorflow'" (hoặc pandas/numpy)
 
 **Nguyên nhân**: Chưa cài dependencies
 
@@ -297,17 +297,31 @@ uv sync
 
 ---
 
-### ❌ Lỗi 2: "API rate limit exceeded"
+### ❌ Lỗi 2: "FileNotFoundError: Không tìm thấy file data"
 
-**Nguyên nhân**: Binance API giới hạn số request
+**Nguyên nhân**: `--data-path` trỏ sai, hoặc bạn chưa có file CSV trong `data/`
 
 **Giải pháp**:
-- Đợi 1-2 phút rồi chạy lại
-- Hoặc dùng cache (mặc định đã bật)
+- Kiểm tra file mặc định: `data/btc_1d_data_2018_to_2025.csv`
+- Hoặc chỉ định rõ:
+
+```bash
+uv run main.py --data-path data/btc_1d_data_2018_to_2025.csv
+```
 
 ---
 
-### ❌ Lỗi 3: Overfitting (Train loss thấp, Val loss cao)
+### ❌ Lỗi 3: "CSV thiếu cột bắt buộc"
+
+**Nguyên nhân**: File CSV không đúng format (cần có các cột kiểu Binance export: `Open time`, `Open`, `High`, `Low`, `Close`, `Volume`)
+
+**Giải pháp**:
+- Dùng đúng file mặc định trong `data/`
+- Hoặc sửa header CSV cho khớp các cột trên
+
+---
+
+### ❌ Lỗi 4: Overfitting (Train loss thấp, Val loss cao)
 
 **Nguyên nhân**: Model học vẹt data training
 
@@ -319,7 +333,7 @@ uv sync
 
 ---
 
-### ❌ Lỗi 4: Underfitting (Cả train và val loss đều cao)
+### ❌ Lỗi 5: Underfitting (Cả train và val loss đều cao)
 
 **Nguyên nhân**: Model quá đơn giản, không học được pattern
 
