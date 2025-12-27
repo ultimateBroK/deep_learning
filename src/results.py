@@ -13,13 +13,13 @@ Kết quả được lưu:
 3. Model: File .keras để load lại sau
 """
 
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Optional
 import json
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 
-def _to_jsonable(obj):
+def _to_jsonable(obj: Any) -> Any:
     """
     Convert các kiểu không JSON-serializable về kiểu cơ bản
     """
@@ -61,23 +61,36 @@ def _to_jsonable(obj):
 
 def create_results_folder(
     base_path: Optional[Path] = None,
-    run_type: str = "main"
+    run_type: str = "main",
+    config: Optional[Dict] = None
 ) -> Path:
     """
-    Tạo folder để lưu kết quả
+    Tạo folder để lưu kết quả với tên chuẩn hóa
 
     Giải thích bằng ví dụ đời sống:
     - Giống như "tạo folder hồ sơ mới" cho mỗi lần chạy
     - Không bị lẫn với kết quả lần trước
+    - Tên folder chứa thông tin quan trọng để dễ phân biệt
+
+    Format tên: BiLSTM_{timeframe}_w{window}_e{epochs}_u{lstm_units}_d{dropout}_b{batch}_{scaler}_{timestamp}
+    Ví dụ: BiLSTM_1d_w60_e20_u64-32_d02_b32_mm_20251227_133014
 
     Args:
         base_path: Đường dẫn cơ sở
         run_type: "main", "notebook", "test"
+        config: Dict chứa config với các tham số:
+            - timeframe: str (bắt buộc)
+            - window_size: int (bắt buộc)
+            - epochs: int (tùy chọn)
+            - lstm_units: List[int] (tùy chọn)
+            - dropout_rate: float (tùy chọn)
+            - batch_size: int (tùy chọn)
+            - scaler_type: str (tùy chọn)
 
     Returns:
         Đường dẫn đến folder kết quả
     """
-    from .config import Paths
+    from .config import Paths  # noqa: E402 - Import here to avoid circular dependency
 
     if base_path is None:
         base_path = Paths().reports_dir
@@ -85,7 +98,58 @@ def create_results_folder(
         base_path = Path(base_path)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    folder_path = base_path / run_type / f"BiLSTM_{timestamp}"
+    
+    # Tạo tên folder chuẩn hóa với thông tin config
+    if config and 'timeframe' in config and 'window_size' in config:
+        timeframe = str(config['timeframe']).replace('/', '_')  # Xử lý ký tự đặc biệt
+        window_size = config['window_size']
+        
+        # Bắt đầu với phần cơ bản
+        parts = [f"BiLSTM_{timeframe}", f"w{window_size}"]
+        
+        # Thêm epochs nếu có
+        if 'epochs' in config and config['epochs']:
+            parts.append(f"e{config['epochs']}")
+        
+        # Thêm LSTM units nếu có (rút gọn: 64-32 thay vì 64_32)
+        if 'lstm_units' in config and config['lstm_units']:
+            lstm_units = config['lstm_units']
+            if isinstance(lstm_units, (list, tuple)):
+                units_str = '-'.join(str(u) for u in lstm_units)
+            else:
+                units_str = str(lstm_units)
+            parts.append(f"u{units_str}")
+        
+        # Thêm dropout rate nếu có (làm tròn 2 chữ số, bỏ dấu chấm: 0.2 -> d20, 0.05 -> d05)
+        if 'dropout_rate' in config and config['dropout_rate'] is not None:
+            dropout = config['dropout_rate']
+            # Chuyển 0.2 thành "20", 0.05 thành "05", giữ nguyên số 0 đầu
+            dropout_str = f"{int(dropout * 100):02d}"
+            parts.append(f"d{dropout_str}")
+        
+        # Thêm batch size nếu có
+        if 'batch_size' in config and config['batch_size']:
+            parts.append(f"b{config['batch_size']}")
+        
+        # Thêm scaler type nếu có (rút gọn: minmax -> mm, standard -> std)
+        if 'scaler_type' in config and config['scaler_type']:
+            scaler = config['scaler_type']
+            if scaler == 'minmax':
+                parts.append('mm')
+            elif scaler == 'standard':
+                parts.append('std')
+            else:
+                parts.append(scaler[:2])  # Lấy 2 ký tự đầu
+        
+        # Thêm timestamp
+        parts.append(timestamp)
+        
+        folder_name = '_'.join(parts)
+    else:
+        # Fallback nếu không có config đầy đủ
+        folder_name = f"BiLSTM_{timestamp}"
+    
+    folder_path = base_path / run_type / folder_name
     folder_path.mkdir(parents=True, exist_ok=True)
 
     return folder_path
@@ -94,7 +158,7 @@ def create_results_folder(
 def save_config(
     folder_path: Path,
     config: Dict
-):
+) -> None:
     """
     Lưu cấu hình ra file JSON
 
@@ -111,7 +175,7 @@ def save_config(
 def save_metrics(
     folder_path: Path,
     metrics: Dict
-):
+) -> None:
     """
     Lưu metrics ra file JSON
 
@@ -131,7 +195,7 @@ def save_markdown_report(
     metrics: Dict,
     history: Optional[Dict] = None,
     plots: Optional[Dict] = None
-):
+) -> None:
     """
     Lưu báo cáo tổng hợp dưới dạng Markdown
 
@@ -146,7 +210,9 @@ def save_markdown_report(
         history: Training history
         plots: Dict chứa tên file của các plot
     """
-    report_path = folder_path / f"results_BiLSTM_{folder_path.name.replace('BiLSTM_', '')}.md"
+    # Tạo tên file markdown tương ứng với tên folder
+    # Format: results_{folder_name}.md
+    report_path = folder_path / f"results_{folder_path.name}.md"
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     content = f"# Kết quả dự đoán giá Bitcoin - BiLSTM\n\n**Timestamp:** {now_str}\n\n---\n\n"
@@ -218,7 +284,9 @@ def clean_old_reports(
     Returns:
         Số báo cáo đã xóa
     """
-    from .config import Paths
+    import shutil
+
+    from .config import Paths  # noqa: E402 - Import here to avoid circular dependency
 
     if base_path is None:
         base_path = Paths().reports_dir
@@ -235,7 +303,6 @@ def clean_old_reports(
     # Xóa các folder cũ
     deleted_count = 0
     for folder in folders[keep:]:
-        import shutil
         shutil.rmtree(folder)
         deleted_count += 1
 

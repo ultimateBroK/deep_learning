@@ -14,18 +14,17 @@ Các biểu đồ:
 4. All-in-One: Tất cả trong 1 figure
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from pathlib import Path
 from typing import Optional
-import tensorflow as tf
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 # Set style cho plots
 plt.style.use('seaborn-v0_8-darkgrid')
 
 
-def plot_training_history(history, save_path: Optional[str] = None):
+def plot_training_history(history, save_path: Optional[str] = None) -> None:
     """
     Vẽ biểu đồ training history (loss và val_loss)
 
@@ -71,7 +70,7 @@ def plot_predictions(
     y_pred: np.ndarray,
     save_path: Optional[str] = None,
     n_samples: Optional[int] = None
-):
+) -> None:
     """
     Vẽ biểu đồ dự đoán vs thực tế
 
@@ -124,7 +123,7 @@ def plot_residuals(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     save_path: Optional[str] = None
-):
+) -> None:
     """
     Vẽ biểu đồ residuals (sai số)
 
@@ -170,7 +169,7 @@ def plot_price_history(
     df,
     price_column: str = "close",
     save_path: Optional[str] = None
-):
+) -> None:
     """
     Vẽ lịch sử giá
 
@@ -205,7 +204,7 @@ def plot_all_in_one(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     save_path: Optional[str] = None
-):
+) -> None:
     """
     Vẽ tất cả plots vào một figure
 
@@ -219,7 +218,7 @@ def plot_all_in_one(
         y_pred: Dự đoán
         save_path: Đường dẫn để lưu plot
     """
-    fig = plt.figure(figsize=(16, 10))
+    plt.figure(figsize=(16, 10))
 
     # 1. Training History (top left)
     ax1 = plt.subplot(2, 2, 1)

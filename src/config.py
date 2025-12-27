@@ -14,7 +14,7 @@ Ví dụ:
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 
 # ==================== PROJECT PATHS ====================
@@ -109,7 +109,7 @@ class ModelConfig:
     # Output
     output_units: int = 1
 
-    def get_input_shape(self, window_size: int, n_features: int) -> tuple:
+    def get_input_shape(self, window_size: int, n_features: int) -> Tuple[int, int]:
         """Lấy shape đầu vào cho model"""
         return (window_size, n_features)
 
@@ -174,7 +174,7 @@ class VisualizationConfig:
     dpi: int = 300
 
     # Figure size
-    default_figsize: tuple = (14, 5)
+    default_figsize: Tuple[int, int] = (14, 5)
 
 
 # ==================== MASTER CONFIG ====================

@@ -20,11 +20,7 @@ Trách nhiệm (SoC):
 - Không chứa logic cụ thể (logic ở các module khác)
 """
 
-from pathlib import Path
 from typing import Dict, Optional
-
-import numpy as np
-from tensorflow import keras
 
 # Import từ các module khác
 from .config import Config
@@ -193,11 +189,23 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
     print("💾 LƯU KẾT QUẢ")
     print("=" * 70 + "\n")
 
-    results_folder = create_results_folder(run_type=run_type)
+    # Tạo config dict để đặt tên folder với nhiều tham số quan trọng
+    folder_config = {
+        'timeframe': config.data.timeframe,
+        'window_size': config.preprocessing.window_size,
+        'epochs': config.training.epochs,
+        'lstm_units': config.model.lstm_units,
+        'dropout_rate': config.model.dropout_rate,
+        'batch_size': config.training.batch_size,
+        'scaler_type': config.preprocessing.scaler_type,
+    }
+    results_folder = create_results_folder(run_type=run_type, config=folder_config)
     print(f"\n📁 Folder kết quả: {results_folder}\n")
 
     # Vẽ và lưu biểu đồ
-    timestamp_suffix = results_folder.name.replace('BiLSTM_', '')
+    # Lấy timestamp từ tên folder (2 phần cuối: YYYYMMDD_HHMMSS)
+    folder_parts = results_folder.name.split('_')
+    timestamp_suffix = '_'.join(folder_parts[-2:])  # Lấy 2 phần cuối
 
     plot_history_file = results_folder / f"training_history_{timestamp_suffix}.png"
     plot_predictions_file = results_folder / f"predictions_{timestamp_suffix}.png"
@@ -210,6 +218,7 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
     # Tạo config dict để lưu
     config_dict = {
         'data_path': str(data_file),
+        'symbol': 'BTC/USDT',  # Default symbol
         'timeframe': config.data.timeframe,
         'limit': config.data.limit,
         'data_rows': data_rows,
@@ -221,13 +230,14 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
         'train_samples': len(X_train),
         'val_samples': len(X_val),
         'test_samples': len(X_test),
+        'seed': config.runtime.seed,
         'lstm_units': config.model.lstm_units,
         'dropout_rate': config.model.dropout_rate,
         'epochs': config.training.epochs,
         'batch_size': config.training.batch_size,
+        'early_stopping_patience': config.training.early_stopping_patience,
         'learning_rate': config.training.learning_rate,
         'intra_threads': config.runtime.intra_op_threads,
-        'seed': config.runtime.seed,
         'best_epoch': train_result['best_epoch'],
         'best_val_loss': train_result['best_val_loss'],
         'train_seconds': train_result['train_seconds'],

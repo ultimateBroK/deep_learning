@@ -17,11 +17,36 @@ Usage:
 """
 
 import argparse
+import os
 import sys
+import warnings
 from pathlib import Path
+
+# Suppress warnings TRƯỚC khi import bất kỳ thứ gì
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Chỉ hiển thị ERROR (0=all, 1=no INFO, 2=no WARNING, 3=no ERROR)
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Tắt oneDNN warnings
+
+# Suppress Python warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings('ignore', message='.*np.object.*')
+warnings.filterwarnings('ignore', message='.*oneDNN.*')
+warnings.filterwarnings('ignore', message='.*CUDA.*')
+warnings.filterwarnings('ignore', message='.*Could not find cuda.*')
+warnings.filterwarnings('ignore', message='.*cuda drivers.*')
+warnings.filterwarnings('ignore', message='.*GPU will not be used.*')
 
 # Thêm src vào path để import được
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Import và suppress TensorFlow logger ngay lập tức
+try:
+    import tensorflow as tf
+    tf.get_logger().setLevel('ERROR')
+    # Suppress stderr output từ TensorFlow
+    import logging
+    logging.getLogger('tensorflow').setLevel(logging.ERROR)
+except ImportError:
+    pass  # TensorFlow chưa được cài đặt
 
 from src import Config, run_pipeline
 
@@ -87,6 +112,13 @@ Ví dụ:
         default=60,
         help='Số nến nhìn lại (mặc định: 60)'
     )
+    prep_group.add_argument(
+        '--scaler-type',
+        type=str,
+        default='minmax',
+        choices=['minmax', 'standard'],
+        help='Loại scaler (mặc định: minmax)'
+    )
 
     # ==================== MODEL ARGS ====================
     model_group = parser.add_argument_group("🧠 Model", "Cấu hình model")
@@ -120,6 +152,18 @@ Ví dụ:
         default=32,
         help='Batch size (mặc định: 32)'
     )
+    train_group.add_argument(
+        '--learning-rate',
+        type=float,
+        default=None,
+        help='Learning rate (mặc định: 0.001)'
+    )
+    train_group.add_argument(
+        '--early-stopping-patience',
+        type=int,
+        default=None,
+        help='Số epochs chờ trước khi dừng (mặc định: 5)'
+    )
 
     # ==================== RUNTIME ARGS ====================
     runtime_group = parser.add_argument_group("⚡ Runtime", "Cấu hình runtime")
@@ -127,8 +171,14 @@ Ví dụ:
     runtime_group.add_argument(
         '--intra-threads',
         type=int,
-        default=12,
-        help='CPU threads cho operations (mặc định: 12)'
+        default=None,
+        help='CPU threads cho operations trong cùng op (mặc định: 12)'
+    )
+    runtime_group.add_argument(
+        '--inter-threads',
+        type=int,
+        default=None,
+        help='CPU threads cho operations khác nhau (mặc định: 2)'
     )
     runtime_group.add_argument(
         '--seed',
@@ -195,6 +245,8 @@ def main():
         config.data.features = args.features
     if args.window:
         config.preprocessing.window_size = args.window
+    if args.scaler_type:
+        config.preprocessing.scaler_type = args.scaler_type
     if args.lstm_units:
         config.model.lstm_units = args.lstm_units
     if args.dropout:
@@ -203,8 +255,14 @@ def main():
         config.training.epochs = args.epochs
     if args.batch_size:
         config.training.batch_size = args.batch_size
-    if args.intra_threads:
+    if args.learning_rate is not None:
+        config.training.learning_rate = args.learning_rate
+    if args.early_stopping_patience is not None:
+        config.training.early_stopping_patience = args.early_stopping_patience
+    if args.intra_threads is not None:
         config.runtime.intra_op_threads = args.intra_threads
+    if args.inter_threads is not None:
+        config.runtime.inter_op_threads = args.inter_threads
     if args.seed:
         config.runtime.seed = args.seed
 

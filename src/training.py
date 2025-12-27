@@ -20,7 +20,7 @@ Trách nhiệm (SoC):
 
 import time
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 import numpy as np
 from tensorflow import keras
@@ -36,7 +36,7 @@ def train_model(
     X_val: np.ndarray,
     y_val: np.ndarray,
     config: Config
-) -> Dict:
+) -> Dict[str, Any]:
     """
     Huấn luyện model với callbacks
 

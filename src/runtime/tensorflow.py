@@ -72,7 +72,7 @@ def configure_tensorflow_runtime(
     inter_op_threads: int = 2,
     enable_xla: bool = True,
     use_gpu: bool = False
-):
+) -> None:
     """
     Cấu hình runtime TensorFlow cho CPU AMD
 
@@ -147,7 +147,7 @@ def get_gpu_info() -> bool:
         return False
 
 
-def set_memory_growth():
+def set_memory_growth() -> None:
     """
     Cho phép GPU tự tăng bộ nhớ khi cần
 
@@ -166,7 +166,7 @@ def set_memory_growth():
             print(f"❌ Lỗi khi cấu hình GPU: {e}")
 
 
-def print_tensorflow_info():
+def print_tensorflow_info() -> None:
     """
     In thông tin về TensorFlow và runtime
     """

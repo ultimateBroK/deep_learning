@@ -17,7 +17,8 @@ Lợi ích:
 - Kết quả thường tốt hơn LSTM thường
 """
 
-from typing import Tuple
+from typing import List, Tuple
+
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, models
@@ -25,9 +26,9 @@ from tensorflow.keras import layers, models
 
 def build_bilstm_model(
     input_shape: Tuple[int, int],
-    lstm_units: list = [64, 32],
+    lstm_units: List[int] = None,
     dropout_rate: float = 0.2,
-    dense_units: list = [16],
+    dense_units: List[int] = None,
     output_units: int = 1,
     learning_rate: float = 0.001
 ) -> models.Sequential:
@@ -50,6 +51,11 @@ def build_bilstm_model(
         lstm_units = [64, 32]   # 2 LSTM layers với 64 và 32 units
         output_units = 1       # Dự đoán 1 giá trị (giá ngày mai)
     """
+    if lstm_units is None:
+        lstm_units = [64, 32]
+    if dense_units is None:
+        dense_units = [16]
+    
     model = models.Sequential(name="BiLSTM_Price_Prediction")
 
     # Input layer
@@ -100,7 +106,7 @@ def build_bilstm_model(
     return model
 
 
-def print_model_summary(model: models.Sequential):
+def print_model_summary(model: models.Sequential) -> None:
     """
     In thông tin chi tiết về model
 

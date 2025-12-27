@@ -15,9 +15,10 @@ Trách nhiệm (SoC - Separation of Concerns):
 - Chỉ xử lý dữ liệu, không làm gì khác
 """
 
+from typing import Dict, List, Tuple
+
 import numpy as np
 import polars as pl
-from typing import Tuple, Optional
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 
@@ -96,7 +97,7 @@ def split_data(
     val = data[train_end:val_end]
     test = data[val_end:]
 
-    print(f"✅ Chia dữ liệu:")
+    print("✅ Chia dữ liệu:")
     print(f"   Train: {len(train)} mẫu ({train_ratio:.0%})")
     print(f"   Val:   {len(val)} mẫu ({val_ratio:.0%})")
     print(f"   Test:  {len(test)} mẫu ({(1-train_ratio-val_ratio):.0%})")
@@ -184,7 +185,7 @@ class DataScaler:
 
         return self.scaler.inverse_transform(data).flatten()
 
-    def get_params(self):
+    def get_params(self) -> Dict:
         """Lấy params của scaler"""
         if hasattr(self.scaler, 'data_min_'):
             return {
@@ -205,12 +206,12 @@ class DataScaler:
 # ==================== COMPLETE PIPELINE ====================
 def prepare_data_for_lstm(
     df: pl.DataFrame,
-    features: list = ["close"],
+    features: List[str] = None,
     window_size: int = 60,
     scaler_type: str = "minmax",
     train_ratio: float = 0.7,
     val_ratio: float = 0.15
-) -> dict:
+) -> Dict:
     """
     Pipeline hoàn chỉnh để chuẩn bị dữ liệu cho LSTM
 
@@ -229,6 +230,9 @@ def prepare_data_for_lstm(
     Returns:
         Dictionary chứa tất cả dữ liệu đã chuẩn bị
     """
+    if features is None:
+        features = ["close"]
+    
     print("\n" + "=" * 70)
     print("🔧 CHUẨN BỊ DỮ LIỆU CHO LSTM")
     print("=" * 70 + "\n")
@@ -251,7 +255,7 @@ def prepare_data_for_lstm(
     X_val, y_val = create_windows(val_data, window_size)
     X_test, y_test = create_windows(test_data, window_size)
 
-    print(f"\n✅ Dữ liệu sau khi tạo windows:")
+    print("\n✅ Dữ liệu sau khi tạo windows:")
     print(f"   X_train: {X_train.shape}, y_train: {y_train.shape}")
     print(f"   X_val:   {X_val.shape}, y_val: {y_val.shape}")
     print(f"   X_test:  {X_test.shape}, y_test: {y_test.shape}")

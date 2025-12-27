@@ -15,8 +15,9 @@ Trách nhiệm (SoC - Separation of Concerns):
 
 from datetime import datetime
 from pathlib import Path
-import polars as pl
 from typing import Optional
+
+import polars as pl
 
 
 def _infer_timeframe_from_filename(path: Path) -> Optional[str]:
@@ -120,7 +121,7 @@ def fetch_binance_data(
         DataFrame với các cột: datetime, open, high, low, close, volume
     """
     # Xác định thư mục data và cache
-    from ..config import Paths
+    from ..config import Paths  # noqa: E402 - Import here to avoid circular dependency
 
     if data_dir is None:
         data_dir = Paths().data_dir
@@ -201,7 +202,7 @@ def clear_cache(cache_dir: Optional[Path] = None, older_than_days: Optional[int]
     Returns:
         Số file đã xóa
     """
-    from ..config import Paths
+    from ..config import Paths  # noqa: E402 - Import here to avoid circular dependency
 
     if cache_dir is None:
         cache_dir = Paths().cache_dir

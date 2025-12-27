@@ -13,8 +13,9 @@ Các metrics:
 4. Direction Accuracy: Độ chính xác khi dự đoán xu hướng (tăng/giảm)
 """
 
+from typing import Dict, Optional
+
 import numpy as np
-from typing import Dict
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
@@ -93,7 +94,7 @@ def print_sample_predictions(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     n_samples: int = 10
-):
+) -> None:
     """
     In một số ví dụ dự đoán
 
