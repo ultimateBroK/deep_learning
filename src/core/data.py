@@ -23,9 +23,16 @@ import polars as pl
 def _infer_timeframe_from_filename(path: Path) -> Optional[str]:
     """
     Infer timeframe từ tên file
-    Ví dụ: btc_4h_data_2018_to_2025.csv → 4h
+    Ví dụ: btc_15m_data_2018_to_2025.csv → 15m
+            btc_4h_data_2018_to_2025.csv → 4h
+            btc_1d_data_2018_to_2025.csv → 1d
     """
     name = path.name.lower()
+    # Thử theo thứ tự từ dài đến ngắn để tránh ghi đè không chính xác
+    if "15m" in name:
+        return "15m"
+    if "1h" in name:
+        return "1h"
     if "4h" in name:
         return "4h"
     if "1d" in name:
@@ -138,7 +145,12 @@ def fetch_binance_data(
     # Xác định file dữ liệu
     if data_path is None:
         tf = (timeframe or "1d").lower()
-        if tf == "4h":
+        # Chọn file tương ứng với timeframe
+        if tf == "15m":
+            data_file = data_dir / "btc_15m_data_2018_to_2025.csv"
+        elif tf == "1h":
+            data_file = data_dir / "btc_1h_data_2018_to_2025.csv"
+        elif tf == "4h":
             data_file = data_dir / "btc_4h_data_2018_to_2025.csv"
         else:
             data_file = data_dir / "btc_1d_data_2018_to_2025.csv"

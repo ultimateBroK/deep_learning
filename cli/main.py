@@ -48,7 +48,8 @@ try:
 except ImportError:
     pass  # TensorFlow chưa được cài đặt
 
-from src import Config, run_pipeline
+from src import Config, run_pipeline, get_default_config, get_fast_config, get_1h_light_config, get_4h_balanced_config, get_scalping_ultra_fast_config, get_scalping_fast_config, get_intraday_light_config, get_intraday_balanced_config, get_swing_fast_config, get_swing_balanced_config, get_long_term_config, get_production_config   # noqa: E402
+from src.core.data import _infer_timeframe_from_filename   # noqa: E402
 
 
 def parse_args():
@@ -80,14 +81,14 @@ Ví dụ:
     data_group.add_argument(
         '--timeframe',
         type=str,
-        default='1d',
-        choices=['1d', '4h'],
+        default=None,
+        choices=['1d', '4h', '1h', '15m'],
         help='Timeframe (mặc định: 1d)'
     )
     data_group.add_argument(
         '--limit',
         type=int,
-        default=1500,
+        default=None,
         help='Lấy N dòng cuối trong file CSV (mặc định: 1500, <=0 = lấy tất cả)'
     )
     data_group.add_argument(
@@ -99,7 +100,7 @@ Ví dụ:
         '--features',
         type=str,
         nargs='+',
-        default=['close'],
+        default=None,
         help='Features sử dụng (mặc định: close)'
     )
 
@@ -109,13 +110,13 @@ Ví dụ:
     prep_group.add_argument(
         '--window',
         type=int,
-        default=60,
+        default=None,
         help='Số nến nhìn lại (mặc định: 60)'
     )
     prep_group.add_argument(
         '--scaler-type',
         type=str,
-        default='minmax',
+        default=None,
         choices=['minmax', 'standard'],
         help='Loại scaler (mặc định: minmax)'
     )
@@ -127,13 +128,13 @@ Ví dụ:
         '--lstm-units',
         type=int,
         nargs='+',
-        default=[64, 32],
+        default=None,
         help='Số units cho mỗi LSTM layer (mặc định: 64 32)'
     )
     model_group.add_argument(
         '--dropout',
         type=float,
-        default=0.2,
+        default=None,
         help='Dropout rate (mặc định: 0.2)'
     )
 
@@ -143,13 +144,13 @@ Ví dụ:
     train_group.add_argument(
         '--epochs',
         type=int,
-        default=20,
+        default=None,
         help='Số epochs (mặc định: 20)'
     )
     train_group.add_argument(
         '--batch-size',
         type=int,
-        default=32,
+        default=None,
         help='Batch size (mặc định: 32)'
     )
     train_group.add_argument(
@@ -183,7 +184,7 @@ Ví dụ:
     runtime_group.add_argument(
         '--seed',
         type=int,
-        default=42,
+        default=None,
         help='Cố định ngẫu nhiên để tái lập kết quả (mặc định: 42, <0 = không set)'
     )
 
@@ -193,7 +194,7 @@ Ví dụ:
     preset_group.add_argument(
         '--preset',
         type=str,
-        choices=['default', 'fast', 'high-quality'],
+        choices=['default', 'fast', '1h-light', '4h-balanced', 'scalping-ultra-fast', 'scalping-fast', 'intraday-light', 'intraday-balanced', 'swing-fast', 'swing-balanced', 'long-term', 'production'],
         default='default',
         help='Preset config (mặc định: default)'
     )
@@ -211,49 +212,51 @@ def main():
     args = parse_args()
 
     # Chọn preset
-    if args.preset == 'fast':
-        config = Config.from_args(
-            limit=500,
-            window=30,
-            epochs=5,
-            lstm_units=[32, 16],
-            intra_threads=6,
-            seed=args.seed
-        )
-    elif args.preset == 'high-quality':
-        config = Config.from_args(
-            limit=3000,
-            window=90,
-            epochs=50,
-            lstm_units=[128, 64, 32],
-            intra_threads=args.intra_threads,
-            seed=args.seed
-        )
-    else:
-        config = Config()
+    preset_map = {
+        'default': get_default_config,
+        'fast': get_fast_config,
+        '1h-light': get_1h_light_config,
+        '4h-balanced': get_4h_balanced_config,
+        'scalping-ultra-fast': get_scalping_ultra_fast_config,
+        'scalping-fast': get_scalping_fast_config,
+        'intraday-light': get_intraday_light_config,
+        'intraday-balanced': get_intraday_balanced_config,
+        'swing-fast': get_swing_fast_config,
+        'swing-balanced': get_swing_balanced_config,
+        'long-term': get_long_term_config,
+        'production': get_production_config,
+    }
 
-    # Override config với CLI args
-    if args.data_path:
+    config = preset_map[args.preset]()
+
+    # Override config với CLI args (chỉ khi user truyền vào)
+    if args.data_path is not None:
         config.data.data_path = args.data_path
-    if args.timeframe:
+        # Infer timeframe từ filename nếu user không chỉ định --timeframe
+        if args.timeframe is None:
+            inferred_tf = _infer_timeframe_from_filename(Path(args.data_path))
+            if inferred_tf:
+                config.data.timeframe = inferred_tf
+
+    if args.timeframe is not None:
         config.data.timeframe = args.timeframe
-    if args.limit:
+    if args.limit is not None:
         config.data.limit = args.limit
     if args.refresh_cache:
         config.data.refresh_cache = args.refresh_cache
-    if args.features:
+    if args.features is not None:
         config.data.features = args.features
-    if args.window:
+    if args.window is not None:
         config.preprocessing.window_size = args.window
-    if args.scaler_type:
+    if args.scaler_type is not None:
         config.preprocessing.scaler_type = args.scaler_type
-    if args.lstm_units:
+    if args.lstm_units is not None:
         config.model.lstm_units = args.lstm_units
-    if args.dropout:
+    if args.dropout is not None:
         config.model.dropout_rate = args.dropout
-    if args.epochs:
+    if args.epochs is not None:
         config.training.epochs = args.epochs
-    if args.batch_size:
+    if args.batch_size is not None:
         config.training.batch_size = args.batch_size
     if args.learning_rate is not None:
         config.training.learning_rate = args.learning_rate
@@ -263,7 +266,7 @@ def main():
         config.runtime.intra_op_threads = args.intra_threads
     if args.inter_threads is not None:
         config.runtime.inter_op_threads = args.inter_threads
-    if args.seed:
+    if args.seed is not None:
         config.runtime.seed = args.seed
 
     # In header

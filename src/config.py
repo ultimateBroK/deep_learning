@@ -10,6 +10,8 @@ Giải thích bằng ví dụ đời sống:
 Ví dụ:
 - Muốn thay số epochs → sửa ở đây, không sửa trong main.py, notebook, test...
 - Muốn thay timeframe → sửa ở đây, tất cả tự động cập nhật
+
+TẬP TRUNG VÀO 15m TIMEFRAME (280K DÒNG DATA)
 """
 
 from dataclasses import dataclass, field
@@ -48,10 +50,10 @@ class DataConfig:
 
     # File dữ liệu
     data_path: str = None  # None = tự chọn theo timeframe
-    timeframe: str = "1d"  # 1d hoặc 4h
+    timeframe: str = "15m"  # Default là 15m để tận dụng data khủng
 
     # Giới hạn dữ liệu
-    limit: int = 1500  # Lấy N dòng cuối (<=0 = lấy tất cả)
+    limit: int = 50000  # Default là 50k dòng cho 15m
 
     # Features dùng để dự đoán
     features: List[str] = field(default_factory=lambda: ["close"])
@@ -67,6 +69,10 @@ class DataConfig:
         tf = self.timeframe.lower()
         paths = Paths()
 
+        if tf == "15m":
+            return paths.data_dir / "btc_15m_data_2018_to_2025.csv"
+        if tf == "1h":
+            return paths.data_dir / "btc_1h_data_2018_to_2025.csv"
         if tf == "4h":
             return paths.data_dir / "btc_4h_data_2018_to_2025.csv"
         return paths.data_dir / "btc_1d_data_2018_to_2025.csv"
@@ -79,7 +85,7 @@ class PreprocessingConfig:
     """Cấu hình cho tiền xử lý dữ liệu"""
 
     # Sliding Window
-    window_size: int = 60  # Số nến nhìn lại
+    window_size: int = 240  # Default: 4 ngày 15m
     predict_steps: int = 1  # Số bước dự đoán (thường = 1)
 
     # Scaling
@@ -104,7 +110,7 @@ class ModelConfig:
     dropout_rate: float = 0.2
 
     # Dense layers
-    dense_units: List[int] = field(default_factory=lambda: [16])
+    dense_units: List[int] = field(default_factory=lambda: [32])
 
     # Output
     output_units: int = 1
@@ -121,11 +127,11 @@ class TrainingConfig:
     """Cấu hình cho training"""
 
     # Training parameters
-    epochs: int = 20
+    epochs: int = 30
     batch_size: int = 32
 
     # Early stopping
-    early_stopping_patience: int = 5
+    early_stopping_patience: int = 10
 
     # Learning rate
     learning_rate: float = 0.001
@@ -274,28 +280,154 @@ class Config:
 
 # ==================== PRESET CONFIGS ====================
 # Giống như "combo menu" - config có sẵn cho từng mục đích
+# TẬP TRUNG VÀO 15m TIMEFRAME (280K DÒNG DATA)
+
+# ==================== SCALPING PRESETS (15m - Ngắn hạn cực nhanh) ====================
+def get_scalping_ultra_fast_config() -> Config:
+    """Scalping siêu nhanh - cho 15m, dự đoán 6 tiếng tới"""
+    config = Config()
+    config.data.limit = 10000
+    config.preprocessing.window_size = 24  # 6 tiếng 15m
+    config.training.epochs = 5
+    config.model.lstm_units = [16]
+    config.model.dense_units = []
+    config.runtime.intra_op_threads = 4
+    return config
+
+
+def get_scalping_fast_config() -> Config:
+    """Scalping nhanh - cho 15m, dự đoán 12 tiếng tới"""
+    config = Config()
+    config.data.limit = 20000
+    config.preprocessing.window_size = 48  # 12 tiếng 15m
+    config.training.epochs = 10
+    config.model.lstm_units = [32, 16]
+    config.model.dense_units = [16]
+    config.runtime.intra_op_threads = 6
+    return config
+
+
+# ==================== INTRADAY PRESETS (15m - Ngắn hạn) ====================
+def get_intraday_light_config() -> Config:
+    """Intraday nhẹ - cho 15m, dự đoán 1 ngày tới"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 96  # 1 ngày 15m
+    config.training.epochs = 15
+    config.training.early_stopping_patience = 5
+    config.model.lstm_units = [32, 16]
+    config.model.dense_units = [16]
+    config.runtime.intra_op_threads = 8
+    return config
+
+
+def get_intraday_balanced_config() -> Config:
+    """Intraday cân bằng - cho 15m, dự đoán 1.5 ngày tới"""
+    config = Config()
+    config.data.limit = 50000
+    config.preprocessing.window_size = 144  # 1.5 ngày 15m
+    config.training.epochs = 25
+    config.training.early_stopping_patience = 8
+    config.model.lstm_units = [64, 32]
+    config.model.dense_units = [32]
+    config.runtime.intra_op_threads = 10
+    return config
+
+
+# ==================== SWING PRESETS (15m - Trung hạn) ====================
+def get_swing_fast_config() -> Config:
+    """Swing nhanh - cho 15m, dự đoán 2.5 ngày tới"""
+    config = Config()
+    config.data.limit = 70000
+    config.preprocessing.window_size = 240  # 2.5 ngày 15m
+    config.training.epochs = 30
+    config.training.early_stopping_patience = 10
+    config.model.lstm_units = [64, 32]
+    config.model.dense_units = [32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_swing_balanced_config() -> Config:
+    """Swing cân bằng - cho 15m, dự đoán 4 ngày tới"""
+    config = Config()
+    config.data.limit = 100000
+    config.preprocessing.window_size = 384  # 4 ngày 15m
+    config.training.epochs = 50
+    config.training.early_stopping_patience = 12
+    config.model.lstm_units = [128, 64, 32]
+    config.model.dense_units = [64, 32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+# ==================== LONG-TERM PRESETS (15m - Dài hạn) ====================
+def get_long_term_config() -> Config:
+    """Long-term - cho 15m, dự đoán 6 ngày tới"""
+    config = Config()
+    config.data.limit = 150000
+    config.preprocessing.window_size = 576  # 6 ngày 15m
+    config.training.epochs = 80
+    config.training.early_stopping_patience = 15
+    config.model.lstm_units = [256, 128, 64, 32]
+    config.model.dense_units = [128, 64]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+# ==================== PRODUCTION PRESETS (15m - Chất lượng cao nhất) ====================
+def get_production_config() -> Config:
+    """Production - cho 15m, dự đoán 8 ngày tới, chất lượng cao nhất"""
+    config = Config()
+    config.data.limit = 200000
+    config.preprocessing.window_size = 768  # 8 ngày 15m
+    config.training.epochs = 100
+    config.training.early_stopping_patience = 20
+    config.model.lstm_units = [256, 128, 64, 32]
+    config.model.dense_units = [128, 64, 32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+# ==================== LEGACY PRESETS (Cho các timeframe khác) ====================
 def get_default_config() -> Config:
-    """Config mặc định - cân bằng giữa tốc độ và chất lượng"""
+    """Config mặc định - dành cho 15m timeframe (default)"""
     return Config()
 
 
 def get_fast_config() -> Config:
-    """Config nhanh - dùng cho test/development"""
+    """Config nhanh - dùng cho test/development với 15m"""
     config = Config()
-    config.data.limit = 500
-    config.preprocessing.window_size = 30
-    config.training.epochs = 5
+    config.data.limit = 20000
+    config.preprocessing.window_size = 48
+    config.training.epochs = 10
     config.model.lstm_units = [32, 16]
+    config.runtime.intra_op_threads = 6
     return config
 
 
-def get_high_quality_config() -> Config:
-    """Config chất lượng cao - dùng cho production"""
+def get_1h_light_config() -> Config:
+    """1h nhẹ - dùng cho testing với 1h timeframe"""
     config = Config()
-    config.data.limit = 3000
-    config.preprocessing.window_size = 90
-    config.training.epochs = 50
-    config.training.early_stopping_patience = 10
-    config.model.lstm_units = [128, 64, 32]
-    config.model.dense_units = [64, 32]
+    config.data.timeframe = "1h"  # Set timeframe cho 1h
+    config.data.limit = 10000
+    config.preprocessing.window_size = 48  # 2 ngày 1h
+    config.training.epochs = 15
+    config.model.lstm_units = [32, 16]
+    config.model.dense_units = [16]
+    config.runtime.intra_op_threads = 8
+    return config
+
+
+def get_4h_balanced_config() -> Config:
+    """4h cân bằng - dùng cho 4h timeframe"""
+    config = Config()
+    config.data.timeframe = "4h"  # Set timeframe cho 4h
+    config.data.limit = 2000
+    config.preprocessing.window_size = 24  # 4 ngày 4h
+    config.training.epochs = 30
+    config.training.early_stopping_patience = 8
+    config.model.lstm_units = [64, 32]
+    config.model.dense_units = [32]
+    config.runtime.intra_op_threads = 10
     return config
