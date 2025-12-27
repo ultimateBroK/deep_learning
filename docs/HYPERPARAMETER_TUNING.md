@@ -2,15 +2,19 @@
 
 Tài liệu này cung cấp danh sách các lệnh với các tham số khác nhau để tìm ra cấu hình tốt nhất cho model BiLSTM dự đoán giá Bitcoin.
 
+> **[!IMPORTANT]**
+> Project tập trung vào **15m timeframe** với data khổng lồ (~280K dòng).
+
 ---
 
 ## 📋 Mục Lục
 
 1. [Tổng Quan](#tổng-quan)
-2. [Các Tham Số Quan Trọng](#các-tham-số-quan-trọng)
-3. [Chiến Lược Tuning](#chiến-lược-tuning)
-4. [Danh Sách Lệnh](#danh-sách-lệnh)
-5. [So Sánh Kết Quả](#so-sánh-kết-quả)
+2. [Danh Sách Presets (Khuyến Nghị)](#danh-sách-presets-khuyến-nghị)
+3. [Các Tham Số Quan Trọng](#các-tham-số-quan-trọng)
+4. [Chiến Lược Tuning](#chiến-lược-tuning)
+5. [Danh Sách Lệnh (Manual Tuning)](#danh-sách-lệnh-manual-tuning)
+6. [So Sánh Kết Quả](#so-sánh-kết-quả)
 
 ---
 
@@ -20,10 +24,53 @@ Tài liệu này cung cấp danh sách các lệnh với các tham số khác nh
 Tìm ra cấu hình tốt nhất bằng cách thử nghiệm các tổ hợp tham số khác nhau và so sánh kết quả (MAE, RMSE, MAPE, Direction Accuracy).
 
 ### Quy Trình
-1. **Chạy nhiều experiments** với các tham số khác nhau
-2. **Lưu kết quả** vào `reports/cli/` (tên folder tự động chứa timeframe và window_size)
-3. **So sánh metrics** từ các file `results_*.md`
-4. **Chọn cấu hình tốt nhất** dựa trên mục tiêu (MAE thấp nhất, Direction Accuracy cao nhất, v.v.)
+1. **Chọn preset phù hợp** (xem bảng bên dưới)
+2. **Chạy experiment** với preset hoặc tham số tùy chỉnh
+3. **Lưu kết quả** vào `reports/cli/` (tên folder tự động chứa timeframe và window_size)
+4. **So sánh metrics** từ các file `results_*.md`
+5. **Chọn cấu hình tốt nhất** dựa trên mục tiêu (MAE thấp nhất, Direction Accuracy cao nhất, v.v.)
+
+---
+
+## 📦 Danh Sách Presets (Khuyến Nghị)
+
+> **Tip:** Sử dụng preset có sẵn thay vì cấu hình thủ công - được tối ưu hóa cho từng mục đích!
+
+| Preset | Limit | Window | Epochs | Mục đích | Khuyến nghị |
+|--------|-------|--------|--------|----------|-------------|
+| **Scalping** (Siêu ngắn hạn) |
+| `scalping-ultra-fast` | 10K | 24 (6h) | 5 | Scalping cực nhanh | Test nhanh |
+| `scalping-fast` | 20K | 48 (12h) | 10 | Scalping nhanh | Scalping 15m |
+| **Intraday** (Ngắn hạn) |
+| `intraday-light` | 30K | 96 (1 ngày) | 15 | Intraday nhẹ | Intraday 15m |
+| `intraday-balanced` | 50K | 144 (1.5 ngày) | 25 | Intraday cân bằng | **Khuyến nghị** |
+| **Swing** (Trung hạn) |
+| `swing-fast` | 70K | 240 (2.5 ngày) | 30 | Swing nhanh | Swing 15m |
+| `swing-balanced` | 100K | 384 (4 ngày) | 50 | Swing cân bằng | Swing 15m |
+| **Long-term** (Dài hạn) |
+| `long-term` | 150K | 576 (6 ngày) | 80 | Dự đoán dài hạn | Long-term 15m |
+| **Production** (Chất lượng cao) |
+| `production` | 200K | 768 (8 ngày) | 100 | Production tốt nhất | Production 15m |
+| **Legacy** (Other timeframes) |
+| `default` | 50K | 240 (2.5 ngày) | 30 | Default (15m) | Default config |
+| `fast` | 20K | 48 (12h) | 10 | Test nhanh (15m) | Test nhanh |
+| `1h-light` | 10K | 48 (2 ngày) | 15 | Test (1h) | Test 1h |
+| `4h-balanced` | 2K | 24 (4 ngày) | 30 | Test (4h) | Test 4h |
+
+**Cách dùng presets:**
+```bash
+# Scalping cực nhanh (6h)
+python -m cli.main --preset scalping-ultra-fast
+
+# Intraday cân bằng (1.5 ngày) - Khuyến nghị
+python -m cli.main --preset intraday-balanced
+
+# Production chất lượng cao (8 ngày)
+python -m cli.main --preset production
+
+# Test với 1h timeframe
+python -m cli.main --preset 1h-light
+```
 
 ---
 
@@ -31,26 +78,28 @@ Tìm ra cấu hình tốt nhất bằng cách thử nghiệm các tổ hợp tha
 
 ### 1. **Timeframe** (`--timeframe`)
 - **Ảnh hưởng**: Độ phân giải dữ liệu
-- **Giá trị**: `1d` (ngày), `4h` (4 giờ)
-- **Khuyến nghị**: 
-  - `1d`: Dự đoán dài hạn, ít noise
-  - `4h`: Dự đoán ngắn hạn, nhiều dữ liệu hơn
+- **Giá trị**: `15m`, `1h`, `4h`, `1d` (mặc định: `15m`)
+- **Khuyến nghị**:
+  - `15m`: Tập trung chính, nhiều dữ liệu (~280K dòng), phù hợp cho scalping/intraday
+  - `1h`: Dữ liệu trung bình, phù hợp cho swing trading
+  - `4h`: Dữ liệu ít hơn, phù hợp cho swing dài hạn
+  - `1d`: Dữ liệu ít nhất, phù hợp cho dự đoán dài hạn, ít noise
 
 ### 2. **Window Size** (`--window`)
 - **Ảnh hưởng**: Số nến nhìn lại để dự đoán
-- **Giá trị**: 30-120 (thường dùng: 60)
+- **Giá trị**: 24-768 (tùy timeframe)
 - **Khuyến nghị**:
-  - Nhỏ (30-40): Phản ứng nhanh với thay đổi gần đây
-  - Trung bình (60-80): Cân bằng giữa ngắn hạn và dài hạn
-  - Lớn (90-120): Tập trung vào xu hướng dài hạn
+  - Nhỏ (24-48): Phản ứng nhanh với thay đổi gần đây (scalping)
+  - Trung bình (96-240): Cân bằng giữa ngắn hạn và dài hạn (intraday)
+  - Lớn (384-768): Tập trung vào xu hướng dài hạn (swing/long-term)
 
 ### 3. **LSTM Units** (`--lstm-units`)
 - **Ảnh hưởng**: Độ phức tạp và khả năng học của model
 - **Giá trị**: List các số nguyên, ví dụ: `64 32` hoặc `128 64 32`
 - **Khuyến nghị**:
-  - Nhỏ (`32 16`): Nhanh, ít overfitting, phù hợp dữ liệu nhỏ
-  - Trung bình (`64 32`): Cân bằng tốt (mặc định)
-  - Lớn (`128 64 32`): Mạnh hơn nhưng dễ overfitting, cần nhiều dữ liệu
+  - Nhỏ (`16` hoặc `32 16`): Nhanh, ít overfitting, phù hợp scalping
+  - Trung bình (`64 32`): Cân bằng tốt, khuyến nghị cho intraday
+  - Lớn (`128 64 32` hoặc `256 128 64 32`): Mạnh hơn nhưng dễ overfitting, cần nhiều dữ liệu (swing/long-term)
 
 ### 4. **Dropout Rate** (`--dropout`)
 - **Ảnh hưởng**: Giảm overfitting
@@ -61,23 +110,26 @@ Tìm ra cấu hình tốt nhất bằng cách thử nghiệm các tổ hợp tha
 
 ### 5. **Epochs** (`--epochs`)
 - **Ảnh hưởng**: Số lần học qua toàn bộ dữ liệu
-- **Giá trị**: 10-100 (thường dùng: 20-50)
+- **Giá trị**: 5-100 (thường dùng: 10-50)
 - **Khuyến nghị**:
-  - Ít (10-20): Nhanh, phù hợp khi có early stopping
-  - Nhiều (50-100): Cho kết quả tốt hơn nhưng lâu hơn
+  - Ít (5-15): Nhanh, phù hợp scalping/test
+  - Trung bình (25-50): Khuyến nghị cho intraday
+  - Nhiều (80-100): Cho kết quả tốt hơn nhưng lâu hơn (swing/long-term)
 
 ### 6. **Batch Size** (`--batch-size`)
 - **Ảnh hưởng**: Kích thước batch trong training
 - **Giá trị**: 16, 32, 64, 128
-- **Khuyến nghị**: 
+- **Khuyến nghị**:
   - Nhỏ (16-32): Gradient update thường xuyên hơn, ổn định hơn
   - Lớn (64-128): Nhanh hơn nhưng có thể kém ổn định
 
 ### 7. **Limit** (`--limit`)
 - **Ảnh hưởng**: Số lượng dữ liệu sử dụng
-- **Giá trị**: 500-5000 (mặc định: 1500)
+- **Giá trị**: 10K-200K (mặc định: `50000` cho 15m)
 - **Khuyến nghị**:
-  - Ít (500-1000): Nhanh, phù hợp test
+  - Ít (10K-20K): Nhanh, phù hợp test/scalping
+  - Trung bình (50K-70K): Khuyến nghị cho intraday
+  - Nhiều (100K-200K): Cho kết quả tốt nhất nhưng lâu hơn (swing/long-term)
   - Trung bình (1500-2000): Cân bằng tốt
   - Nhiều (3000+): Kết quả tốt hơn nhưng chậm hơn
 

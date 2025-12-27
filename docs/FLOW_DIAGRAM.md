@@ -380,22 +380,22 @@ Raw Data (CSV local)
         │
         ▼
    DataFrame
-   [1500 rows, 6 cols]
+   [50000 rows, 6 cols] (default: 15m)
         │
         ▼
    Selected Features
-   [1500 rows, 1 col] (close)
+   [50000 rows, 1 col] (close)
         │
         ▼
    Scaled Data
-   [1500, 1] (0-1)
+   [50000, 1] (0-1)
         │
         ▼
    Sliding Window
-   window_size=60
+   window_size=240 (default: 15m)
         │
         ▼
-   X: [1440, 60, 1]   y: [1440, 1]
+   X: [49760, 240, 1]   y: [49760, 1]
         │
         ▼
    ┌──────┴──────┐

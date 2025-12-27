@@ -3,6 +3,9 @@
 Chào mừng bạn đến với **Mô hình dự báo giá Bitcoin với BiLSTM**!
 
 > Được thiết kế đặc biệt cho người ADHD - cấu trúc rõ ràng, dễ hiểu với analogies.
+>
+> **[!IMPORTANT]**
+> Tập trung vào **15m timeframe** với data khổng lồ (~280K dòng).
 
 ---
 
@@ -10,6 +13,7 @@ Chào mừng bạn đến với **Mô hình dự báo giá Bitcoin với BiLSTM*
 
 - [Cấu trúc mới (Refactored)](#-cấu-trúc-mới-refactored)
 - [Cách chạy](#-cách-chạy)
+- [Preset có sẵn](#-preset-có-sẵn)
 - [Tài liệu quan trọng](#-tài-liệu-quan-trọng)
 - [Tips cho người ADHD](#-tips-cho-người-adhd)
 - [Nếu bị lạc](#-nếu-bị-lạc)
@@ -29,10 +33,10 @@ Project đã được refactor theo 3 nguyên tắc quan trọng:
 ```
 deep_learning/
 ├── src/                        # ⭐ SOURCE CODE CHÍNH
-│   ├── config.py               # ⚙️ Config tập trung (DRY)
+│   ├── config.py               # ⚙️ Config tập trung (DRY) - Default: 15m, 50K lines
 │   ├── pipeline.py             # 🔄 Pipeline chính (SoC)
 │   ├── core/                   # 🎯 Business logic
-│   │   ├── data.py            # 📥 Đọc dữ liệu
+│   │   ├── data.py            # 📥 Đọc dữ liệu (hỗ trợ 15m, 1h, 4h, 1d)
 │   │   ├── preprocessing.py   # 🔧 Xử lý dữ liệu
 │   │   ├── model.py           # 🧠 Xây dựng model
 │   │   └── metrics.py         # 📊 Tính metrics
@@ -48,7 +52,8 @@ deep_learning/
 └── docs/                       # 📚 Tài liệu
     ├── SURVIVAL_GUIDE.md        # Hướng dẫn sống còn
     ├── ANALOGIES.md             # Giải thích bằng ví dụ đời sống
-    └── FLOW_DIAGRAM.md          # Sơ đồ flow của chương trình
+    ├── FLOW_DIAGRAM.md          # Sơ đồ flow của chương trình
+    └── HYPERPARAMETER_TUNING.md # Danh sách preset và tuning
 ```
 
 ---
@@ -61,23 +66,67 @@ deep_learning/
 # Cài đặt dependencies
 uv sync
 
-# Chạy với config mặc định
+# Chạy với config mặc định (15m, 50K lines)
 uv run python -m cli.main
 
-# Chạy với tham số tùy chỉnh
-uv run python -m cli.main --epochs 20 --limit 1500
-uv run python -m cli.main --timeframe 4h --window 30
+# Chạy với preset tùy chỉnh (tập trung 15m)
+uv run python -m cli.main --preset scalping-ultra-fast    # Scalping cực nhanh (6h)
+uv run python -m cli.main --preset intraday-light          # Intraday nhẹ (1 ngày)
+uv run python -m cli.main --preset swing-balanced          # Swing cân bằng (4 ngày)
+uv run python -m cli.main --preset production              # Production chất lượng cao (8 ngày)
 
-# Dùng preset (config có sẵn)
-uv run python -m cli.main --preset fast           # Nhanh - test
-uv run python -m cli.main --preset high-quality  # Chất lượng cao - production
+# Chạy với các timeframe khác
+uv run python -m cli.main --timeframe 1h --preset 1h-light
+uv run python -m cli.main --timeframe 4h --preset 4h-balanced
+uv run python -m cli.main --timeframe 1d --preset default
+
+# Chạy với tham số tùy chỉnh
+uv run python -m cli.main --epochs 20 --limit 15000
+uv run python -m cli.main --timeframe 15m --window 240
+uv run python -m cli.main --data-path data/btc_15m_data_2018_to_2025.csv
 ```
 
 **Các tham số quan trọng:**
-- `--data-path`: Đường dẫn file CSV
-- `--timeframe`: `1d`, `4h` (mặc định: `1d`)
-- `--limit`: Lấy N dòng cuối (mặc định: `1500`)
-- `--window`: Số nến nhìn lại (mặc định: `60`)
+- `--data-path`: Đường dẫn file CSV (nếu không chỉ định → tự chọn theo timeframe)
+- `--timeframe`: `15m`, `1h`, `4h`, `1d` (mặc định: `15m`)
+- `--limit`: Lấy N dòng cuối (mặc định: `50000` cho 15m)
+- `--window`: Số nến nhìn lại (mặc định: `240` cho 15m)
+- `--epochs`: Số epochs (mặc định: `30`)
+- `--preset`: Preset có sẵn
+
+### Option 2: Chạy Notebook (Khuyến nghị cho người mới)
+
+```bash
+uv sync
+uv run jupyter notebook
+```
+
+Mở file `notebooks/run_complete.ipynb` và chạy từng cell theo thứ tự.
+
+---
+
+## 📦 Preset Có Sẵn (Tập Trung 15m)
+
+| Preset | Limit | Window | Epochs | Mục đích |
+|--------|-------|--------|--------|----------|
+| **Scalping** (Siêu ngắn hạn) |
+| `scalping-ultra-fast` | 10K | 24 (6h) | 5 | Scalping cực nhanh |
+| `scalping-fast` | 20K | 48 (12h) | 10 | Scalping nhanh |
+| **Intraday** (Ngắn hạn) |
+| `intraday-light` | 30K | 96 (1 ngày) | 15 | Intraday nhẹ |
+| `intraday-balanced` | 50K | 144 (1.5 ngày) | 25 | Intraday cân bằng |
+| **Swing** (Trung hạn) |
+| `swing-fast` | 70K | 240 (2.5 ngày) | 30 | Swing nhanh |
+| `swing-balanced` | 100K | 384 (4 ngày) | 50 | Swing cân bằng |
+| **Long-term** (Dài hạn) |
+| `long-term` | 150K | 576 (6 ngày) | 80 | Dự đoán dài hạn |
+| **Production** (Chất lượng cao) |
+| `production` | 200K | 768 (8 ngày) | 100 | Production tốt nhất |
+| **Legacy** (Other timeframes) |
+| `default` | 50K | 240 (2.5 ngày) | 30 | Default (15m) |
+| `fast` | 20K | 48 (12h) | 10 | Test nhanh (15m) |
+| `1h-light` | 10K | 48 (2 ngày) | 15 | Test (1h) |
+| `4h-balanced` | 2K | 24 (4 ngày) | 30 | Test (4h) |
 - `--epochs`: Số epochs (mặc định: `20`)
 - `--preset`: `default`, `fast`, `high-quality`
 

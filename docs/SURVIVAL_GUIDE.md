@@ -19,16 +19,16 @@ Giải thích chi tiết từng bước + Troubleshooting cho các vấn đề t
 
 ### Giải thích
 - **fetch_binance_data()**: (giữ tên cũ cho tương thích) nhưng thực tế là **đọc file CSV local**
-- **Dữ liệu mặc định**: `data/btc_1d_data_2018_to_2025.csv`
+- **Dữ liệu mặc định**: `data/btc_15m_data_2018_to_2025.csv` (tập trung 15m)
 - **Cache**: Lưu file CSV đã chuẩn hoá (datetime/open/high/low/close/volume) vào `data/cache/` để lần sau đọc nhanh hơn
-- **Timeframe**: Chỉ dùng để chọn file mặc định nếu không set `data_path` (1d/4h)
+- **Timeframe**: Chỉ dùng để chọn file mặc định nếu không set `data_path` (15m/1h/4h/1d)
 
 ### Các tham số
 | Tham số | Giải thích | Mặc định |
 |---------|------------|----------|
-| `data_path` | Đường dẫn CSV | data/btc_1d_data_2018_to_2025.csv |
-| `timeframe` | Dùng để chọn file mặc định | 1d |
-| `limit` | Lấy N dòng cuối của CSV | 1500 |
+| `data_path` | Đường dẫn CSV | data/btc_15m_data_2018_to_2025.csv |
+| `timeframe` | Dùng để chọn file mặc định | 15m |
+| `limit` | Lấy N dòng cuối của CSV | 50000 (cho 15m) |
 | `save_cache` | Có lưu cache không | True |
 
 ### Dữ liệu trả về
@@ -45,9 +45,9 @@ DataFrame với các cột:
 from src.core import fetch_binance_data
 
 df = fetch_binance_data(
-    data_path="data/btc_1d_data_2018_to_2025.csv",
-    timeframe="1d",
-    limit=1500
+    data_path="data/btc_15m_data_2018_to_2025.csv",
+    timeframe="15m",
+    limit=50000
 )
 
 print(df.head())
@@ -375,15 +375,15 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 ### ❌ Lỗi 7: Kết quả dự đoán rất kém
 
 **Nguyên nhân có thể**:
-1. Data quá ít (< 500 samples)
+1. Data quá ít (< 10000 samples cho 15m)
 2. Window size không phù hợp
-3. Timeframe quá nhỏ (1h, 15m) → quá nhiều noise
+3. Model quá phức tạp so với data
 4. Market đang volatile (dự đoán giá crypto rất khó!)
 
 **Giải pháp**:
-1. Tăng limit (1500 → 2000, 3000)
-2. Thử timeframe khác (4h → 1d)
-3. Thử window size khác (30, 60, 90)
+1. Tăng limit (10000 → 50000 cho 15m)
+2. Thử preset khác (scalping-ultra-fast → intraday-balanced)
+3. Thử window size khác (24 → 96 → 240)
 4. Nhận rằng dự đoán giá crypto là vấn đề rất khó!
 
 ---

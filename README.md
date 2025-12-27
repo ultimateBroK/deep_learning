@@ -4,6 +4,9 @@
 
 > [!NOTE]
 > Project đã được refactor theo **KISS**, **DRY**, **SoC**. Xem cấu trúc chi tiết bên dưới.
+>
+> **[!IMPORTANT]**
+> Tập trung vào **15m timeframe** với data khổng lồ (~280K dòng).
 
 ---
 
@@ -12,12 +15,12 @@
 ```
 deep_learning/
 ├── src/                        # ⭐ SOURCE CODE CHÍNH
-│   ├── config.py               # ⚙️ Config tập trung (DRY)
+│   ├── config.py               # ⚙️ Config tập trung (DRY) - Default: 15m, 50K lines
 │   ├── pipeline.py             # 🔄 Pipeline chính (SoC)
 │   ├── results.py              # 💾 Lưu kết quả
 │   ├── training.py             # 🏋️ Training logic
 │   ├── core/                   # 🎯 Business logic
-│   │   ├── data.py            # 📥 Đọc dữ liệu
+│   │   ├── data.py            # 📥 Đọc dữ liệu (hỗ trợ 15m, 1h, 4h, 1d)
 │   │   ├── preprocessing.py   # 🔧 Xử lý dữ liệu
 │   │   ├── model.py           # 🧠 Xây dựng model
 │   │   └── metrics.py         # 📊 Tính metrics
@@ -50,7 +53,7 @@ deep_learning/
 | [docs/SURVIVAL_GUIDE.md](docs/SURVIVAL_GUIDE.md) | Hướng dẫn sống còn | Khi gặp vấn đề |
 | [docs/ANALOGIES.md](docs/ANALOGIES.md) | Giải thích bằng ví dụ đời sống | Khi không hiểu khái niệm |
 | [docs/FLOW_DIAGRAM.md](docs/FLOW_DIAGRAM.md) | Sơ đồ flow của chương trình | Khi muốn hiểu quy trình |
-| [docs/HYPERPARAMETER_TUNING.md](docs/HYPERPARAMETER_TUNING.md) | Danh sách lệnh tuning | Khi muốn tìm cấu hình tốt nhất |
+| [docs/HYPERPARAMETER_TUNING.md](docs/HYPERPARAMETER_TUNING.md) | Danh sách preset và tuning | Khi muốn tìm preset phù hợp |
 
 ---
 
@@ -62,23 +65,33 @@ deep_learning/
 # Cài đặt dependencies
 uv sync
 
-# Chạy với config mặc định
+# Chạy với config mặc định (15m, 50K lines)
 uv run python -m cli.main
 
+# Chạy với preset tùy chỉnh (tập trung 15m)
+uv run python -m cli.main --preset scalping-ultra-fast    # Scalping cực nhanh (6h)
+uv run python -m cli.main --preset intraday-light          # Intraday nhẹ (1 ngày)
+uv run python -m cli.main --preset swing-balanced          # Swing cân bằng (4 ngày)
+uv run python -m cli.main --preset production              # Production chất lượng cao (8 ngày)
+
+# Chạy với các timeframe khác
+uv run python -m cli.main --timeframe 1h --preset 1h-light
+uv run python -m cli.main --timeframe 4h --preset 4h-balanced
+uv run python -m cli.main --timeframe 1d --preset default
+
 # Chạy với tham số tùy chỉnh
-uv run python -m cli.main --epochs 20 --limit 1500
-uv run python -m cli.main --timeframe 4h --window 30
-uv run python -m cli.main --preset fast       # Config nhanh - test
-uv run python -m cli.main --preset high-quality  # Config chất lượng cao
+uv run python -m cli.main --epochs 20 --limit 15000
+uv run python -m cli.main --timeframe 15m --window 240
+uv run python -m cli.main --data-path data/btc_15m_data_2018_to_2025.csv
 ```
 
 **Các tham số quan trọng:**
-- `--data-path`: Đường dẫn file CSV
-- `--timeframe`: `1d`, `4h` (mặc định: `1d`)
-- `--limit`: Lấy N dòng cuối (mặc định: `1500`)
-- `--window`: Số nến nhìn lại (mặc định: `60`)
-- `--epochs`: Số epochs (mặc định: `20`)
-- `--preset`: `default`, `fast`, `high-quality`
+- `--data-path`: Đường dẫn file CSV (nếu không chỉ định → tự chọn theo timeframe)
+- `--timeframe`: `15m`, `1h`, `4h`, `1d` (mặc định: `15m`)
+- `--limit`: Lấy N dòng cuối (mặc định: `50000` cho 15m)
+- `--window`: Số nến nhìn lại (mặc định: `240` cho 15m)
+- `--epochs`: Số epochs (mặc định: `30`)
+- `--preset`: Preset có sẵn
 
 ### Option 2: Chạy Notebook (Khuyến nghị cho người mới)
 
@@ -88,6 +101,31 @@ uv run jupyter notebook
 ```
 
 Mở file `notebooks/run_complete.ipynb` và chạy từng cell theo thứ tự.
+
+---
+
+## 📦 Danh Sách Presets (Tập Trung 15m)
+
+| Preset | Limit | Window | Epochs | Mục đích |
+|--------|-------|--------|--------|----------|
+| **Scalping** (Siêu ngắn hạn) |
+| `scalping-ultra-fast` | 10K | 24 (6h) | 5 | Scalping cực nhanh |
+| `scalping-fast` | 20K | 48 (12h) | 10 | Scalping nhanh |
+| **Intraday** (Ngắn hạn) |
+| `intraday-light` | 30K | 96 (1 ngày) | 15 | Intraday nhẹ |
+| `intraday-balanced` | 50K | 144 (1.5 ngày) | 25 | Intraday cân bằng |
+| **Swing** (Trung hạn) |
+| `swing-fast` | 70K | 240 (2.5 ngày) | 30 | Swing nhanh |
+| `swing-balanced` | 100K | 384 (4 ngày) | 50 | Swing cân bằng |
+| **Long-term** (Dài hạn) |
+| `long-term` | 150K | 576 (6 ngày) | 80 | Dự đoán dài hạn |
+| **Production** (Chất lượng cao) |
+| `production` | 200K | 768 (8 ngày) | 100 | Production tốt nhất |
+| **Legacy** (Other timeframes) |
+| `default` | 50K | 240 (2.5 ngày) | 30 | Default (15m) |
+| `fast` | 20K | 48 (12h) | 10 | Test nhanh (15m) |
+| `1h-light` | 10K | 48 (2 ngày) | 15 | Test (1h) |
+| `4h-balanced` | 2K | 24 (4 ngày) | 30 | Test (4h) |
 
 ---
 
@@ -147,8 +185,9 @@ Mỗi lần chạy tạo folder chứa:
 ```
 ✅ ĐÚNG:
    1. Đọc START_HERE.md
-   2. Chạy CLI hoặc Notebook
-   3. Đọc docs/ANALOGIES.md nếu không hiểu khái niệm
+   2. Chọn preset phù hợp
+   3. Chạy CLI hoặc Notebook
+   4. Đọc docs/ANALOGIES.md nếu không hiểu khái niệm
 
 ❌ SAI:
    - Nhảy lung tung → lạc lối nhanh!
@@ -158,7 +197,7 @@ Mỗi lần chạy tạo folder chứa:
 
 | Cần làm gì? | Mở file nào? |
 |------------|--------------|
-| Đổi config? | `src/config.py` |
+| Đổi config/preset? | `src/config.py` |
 | Đổi cách xử lý data? | `src/core/preprocessing.py` |
 | Đổi model? | `src/core/model.py` |
 | Đổi cách train? | `src/pipeline.py` |
@@ -191,6 +230,9 @@ Tất cả file code có analogies (ví dụ đời sống) để dễ hiểu:
 ### Không hiểu khái niệm?
 → Đọc `docs/ANALOGIES.md`
 
+### Không biết chọn preset nào?
+→ Đọc `docs/HYPERPARAMETER_TUNING.md`
+
 ### Gặp lỗi?
 → Xem `docs/SURVIVAL_GUIDE.md`
 
@@ -203,6 +245,8 @@ Tất cả file code có analogies (ví dụ đời sống) để dễ hiểu:
 - ✅ **Code đơn giản, rõ ràng** (KISS)
 - ✅ **Comments bằng tiếng Việt** với analogies
 - ✅ **Từng bước một** - đừng nhảy cóc!
+- ✅ **Tập trung vào 15m timeframe** với data khổng lồ
+- ✅ **Sử dụng preset có sẵn** - đừng cấu hình thủ công khi không cần
 
 ---
 
@@ -212,7 +256,9 @@ Chọn 1 trong 2 cách:
 
 1. **Nếu bạn thích hướng dẫn chi tiết:**
    → Đọc `START_HERE.md`
+   → Chọn preset phù hợp
    → Chạy notebook: `uv run jupyter notebook`
 
 2. **Nếu bạn thích nhanh gọn:**
-   → Chạy CLI: `uv run python -m cli.main --preset fast`
+   → Chọn preset từ bảng bên trên
+   → Chạy CLI: `uv run python -m cli.main --preset scalping-fast`
