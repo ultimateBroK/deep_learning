@@ -1,128 +1,117 @@
 # Mô hình dự báo giá Bitcoin với BiLSTM
 
-Project đơn giản để học và thực hành dự báo giá Bitcoin (BTC/USDT) bằng mô hình **BiLSTM** (Bidirectional LSTM).
+**Được thiết kế đặc biệt cho người ADHD - cấu trúc rõ ràng, dễ hiểu!**
 
-**Được thiết kế đặc biệt cho người ADHD - mọi thứ được chia thành từng bước rõ ràng, có giải thích bằng ví dụ đời sống.**
+> [!NOTE]
+> Project đã được refactor theo **KISS**, **DRY**, **SoC**. Xem cấu trúc chi tiết bên dưới.
 
-## 📁 Cấu trúc project (Rõ Ràng Từng Bước)
+---
+
+## 📁 Cấu Trúc Project
 
 ```
-Deep_learning/
-├── START_HERE.md             # ⭐ ĐỌC FILE NÀY TRƯỚC!
+deep_learning/
+├── src/                        # ⭐ SOURCE CODE CHÍNH
+│   ├── config.py               # ⚙️ Config tập trung (DRY)
+│   ├── pipeline.py             # 🔄 Pipeline chính (SoC)
+│   ├── results.py              # 💾 Lưu kết quả
+│   ├── training.py             # 🏋️ Training logic
+│   ├── core/                   # 🎯 Business logic
+│   │   ├── data.py            # 📥 Đọc dữ liệu
+│   │   ├── preprocessing.py   # 🔧 Xử lý dữ liệu
+│   │   ├── model.py           # 🧠 Xây dựng model
+│   │   └── metrics.py         # 📊 Tính metrics
+│   ├── runtime/                # ⚡ Runtime config
+│   └── visualization/          # 📊 Vẽ biểu đồ
 │
-├── step1_data/               # BƯỚC 1: Lấy dữ liệu
-│   ├── fetch_data.py         # Đọc dữ liệu từ CSV local (data/)
-│   └── cache/                # Cache CSV đã chuẩn hoá (optional)
+├── cli/                        # 🖥️ COMMAND LINE
+│   └── main.py                # Entry point (KISS)
 │
-├── step2_preprocessing/      # BƯỚC 2: Xử lý dữ liệu
-│   ├── create_windows.py     # Tạo windows (sequences)
-│   └── scaling.py            # Chuẩn hóa dữ liệu
+├── scripts/                    # 🔧 UTILITY SCRIPTS
+│   └── clean.py               # Dọn dẹp project
 │
-├── step3_model/             # BƯỚC 3: Xây dựng model
-│   └── bilstm.py             # Model BiLSTM
-│
-├── step4_training/          # BƯỚC 4: Training
-│   ├── train.py              # Hàm train model
-│   └── evaluate.py          # Đánh giá kết quả
-│
-├── step5_visualization/      # BƯỚC 5: Vẽ biểu đồ
-│   └── plots.py              # Các hàm vẽ biểu đồ
-│
-├── docs/                     # 📚 Tài liệu giải thích
-│   ├── SURVIVAL_GUIDE.md     # Hướng dẫn sống còn
-│   ├── ANALOGIES.md          # Giải thích bằng ví dụ đời sống
-│   └── FLOW_DIAGRAM.md       # Sơ đồ flow của chương trình
-│
-├── notebooks/                # 📓 Notebook để chạy
-│   └── run_complete.ipynb    # Notebook chính (flow rõ ràng)
-│
-├── utils/                    # 🔧 Utilities
-│   ├── runtime.py            # Config TensorFlow
-│   └── save_results.py      # Lưu kết quả (metrics, plots)
-│
-├── reports/                  # 📊 Kết quả đã lưu
-│   ├── main/                 # Kết quả từ main.py
-│   └── notebook/             # Kết quả từ notebook
-│
-└── main.py                   # 🎯 Entry point (CLI)
+├── data/                       # 📂 Dữ liệu
+├── reports/                    # 📊 Kết quả
+├── docs/                       # 📚 Tài liệu
+├── notebooks/                  # 📓 Jupyter notebooks
+├── START_HERE.md               # ⭐ ĐỌC ĐÂY TRƯỚC!
+└── pyproject.toml
 ```
 
-**Mỗi folder chỉ làm 1 việc duy nhất, rõ ràng!**
+**Mỗi module chỉ làm 1 việc duy nhất, rõ ràng (SoC) - Don't Repeat Yourself (DRY) - Keep It Simple (KISS)**
+
+---
 
 ## 📚 Tài Liệu Quan Trọng
 
-- **[START_HERE.md](START_HERE.md)**: Hướng dẫn bắt đầu - **ĐỌC FILE NÀY TRƯỚC!**
-- **[docs/SURVIVAL_GUIDE.md](docs/SURVIVAL_GUIDE.md)**: Hướng dẫn sống còn - giải thích từng bước, troubleshooting
-- **[docs/ANALOGIES.md](docs/ANALOGIES.md)**: Giải thích các khái niệm bằng ví dụ đời sống
-- **[docs/FLOW_DIAGRAM.md](docs/FLOW_DIAGRAM.md)**: Sơ đồ flow của toàn bộ chương trình
+| Tài liệu | Nội dung | Khi nào đọc? |
+|----------|---------|--------------|
+| **[START_HERE.md](START_HERE.md)** | Hướng dẫn bắt đầu | **BÂY GIỜ - BƯỚC 1!** |
+| [docs/SURVIVAL_GUIDE.md](docs/SURVIVAL_GUIDE.md) | Hướng dẫn sống còn | Khi gặp vấn đề |
+| [docs/ANALOGIES.md](docs/ANALOGIES.md) | Giải thích bằng ví dụ đời sống | Khi không hiểu khái niệm |
+| [docs/FLOW_DIAGRAM.md](docs/FLOW_DIAGRAM.md) | Sơ đồ flow của chương trình | Khi muốn hiểu quy trình |
 
-## 🛠️ Cài đặt
+---
+
+## 🚀 Quick Start
+
+### Option 1: Chạy CLI (Nhanh)
+
+```bash
+# Cài đặt dependencies
+uv sync
+
+# Chạy với config mặc định
+uv run python -m cli.main
+
+# Chạy với tham số tùy chỉnh
+uv run python -m cli.main --epochs 20 --limit 1500
+uv run python -m cli.main --timeframe 4h --window 30
+uv run python -m cli.main --preset fast       # Config nhanh - test
+uv run python -m cli.main --preset high-quality  # Config chất lượng cao
+```
+
+**Các tham số quan trọng:**
+- `--data-path`: Đường dẫn file CSV
+- `--timeframe`: `1d`, `4h` (mặc định: `1d`)
+- `--limit`: Lấy N dòng cuối (mặc định: `1500`)
+- `--window`: Số nến nhìn lại (mặc định: `60`)
+- `--epochs`: Số epochs (mặc định: `20`)
+- `--preset`: `default`, `fast`, `high-quality`
+
+### Option 2: Chạy Notebook (Khuyến nghị cho người mới)
 
 ```bash
 uv sync
-```
-
-## 🧹 Dọn dẹp Project
-
-Nếu project có quá nhiều file cache hoặc reports cũ, dùng script `clean.py`:
-
-```bash
-# Dọn tất cả (cache + reports cũ, giữ lại 5 file reports mới nhất)
-uv run clean.py
-
-# Chỉ dọn cache và checkpoint
-uv run clean.py --cache
-
-# Chỉ dọn reports cũ (giữ lại 10 folder mới nhất)
-uv run clean.py --reports --keep 10
-
-# Xóa cache dữ liệu (chỉ file cũ > 30 ngày)
-uv run clean.py --data-cache
-
-# Xóa TẤT CẢ cache dữ liệu
-uv run clean.py --data-cache-force
-```
-
-## 🎯 Cách sử dụng
-
-### Option 1: Chạy Notebook (Khuyến nghị cho người mới)
-
-```bash
 uv run jupyter notebook
 ```
 
 Mở file `notebooks/run_complete.ipynb` và chạy từng cell theo thứ tự.
 
-**Notebook có:**
-- Markdown giải thích từng bước
-- Checklist để đánh dấu tiến độ
-- Analogies để dễ hiểu
+---
 
-### Option 2: Chạy CLI (Nhanh hơn)
+## 🧹 Dọn Dẹp Project
 
 ```bash
-uv run main.py --epochs 20 --limit 1500
+# Xem trước (dry-run)
+uv run python -m scripts.clean
+
+# Thực sự xóa
+uv run python -m scripts.clean --execute
+
+# Chỉ xóa cache cũ (> 7 ngày)
+uv run python -m scripts.clean --cache --days 7
+
+# Chỉ xóa reports cũ (giữ lại 3 folder mới nhất)
+uv run python -m scripts.clean --reports --keep 3
+
+# Xóa tất cả
+uv run python -m scripts.clean --all --execute
 ```
 
-**Các tham số:**
-- `--data-path`: Đường dẫn CSV (mặc định: `data/btc_1d_data_2018_to_2025.csv`)
-- `--timeframe`: `1d`, `4h` (mặc định: `1d`)
-- `--limit`: Lấy N dòng cuối của CSV (mặc định: `1500`)
-- `--window`: Số nến nhìn lại (mặc định: `60`)
-- `--epochs`: Số epochs (mặc định: `20`)
-- `--intra-threads`: CPU threads (mặc định: `12`)
-- `--refresh-cache`: Bỏ qua cache đã chuẩn hoá, đọc lại CSV gốc
+---
 
-## ⚙️ Tối ưu cho CPU AMD
-
-Project đã được tối ưu cho CPU AMD với cấu hình mặc định:
-- `intra_op_threads=12` (số core vật lý)
-- `inter_op_threads=2`
-- `enable_xla=True`
-
-Bạn có thể điều chỉnh trong notebook hoặc CLI.
-
-## 📊 Kết quả
+## 📊 Kết Quả
 
 Sau khi train, bạn sẽ thấy:
 
@@ -130,41 +119,99 @@ Sau khi train, bạn sẽ thấy:
 - **MAE**: Sai số trung bình tuyệt đối (USD)
 - **RMSE**: Căn bậc hai của sai số bình phương trung bình (USD)
 - **MAPE**: Sai số phần trăm trung bình (%)
+- **Direction Accuracy**: Độ chính xác xu hướng (tăng/giảm)
 
 **Biểu đồ:**
-- Giá Bitcoin theo thời gian
-- Training history (loss, val_loss)
-- So sánh dự đoán vs thực tế
+- Training history (loss, val_loss, mae, val_mae)
+- Predictions vs Actual
+- All-in-one (tất cả trong 1 figure)
 
 **Kết quả được tự động lưu vào:**
-- `reports/main/` - Khi chạy `main.py`
+- `reports/cli/` - Khi chạy CLI
 - `reports/notebook/` - Khi chạy notebook
 
-Mỗi lần chạy sẽ tạo folder chứa các file:
-- `results_BiLSTM_YYYYMMDD_HHMMSS.md` - **File chính** (chứa tất cả: metrics, config, training history, links đến biểu đồ)
-- `training_history_BiLSTM_YYYYMMDD_HHMMSS.png` - Biểu đồ training history
-- `predictions_BiLSTM_YYYYMMDD_HHMMSS.png` - Biểu đồ dự đoán vs thực tế
+Mỗi lần chạy tạo folder chứa:
+- `results_BiLSTM_YYYYMMDD_HHMMSS.md` - Báo cáo tổng hợp
+- `training_history_*.png` - Biểu đồ training history
+- `predictions_*.png` - Biểu đồ dự đoán
+- `all_in_one_*.png` - Biểu đồ tổng hợp
+- `config.json` - Cấu hình
+- `metrics.json` - Metrics
 
-> 💡 **Lưu ý:** Tất cả kết quả được tổng hợp trong file `.md` duy nhất để dễ đọc, không bị phân tán!
+---
 
 ## 💡 Tips Cho Người ADHD
 
-1. **Làm từng bước một**: Đừng nhảy cóc, làm xong bước này mới sang bước kia
-2. **Đánh dấu checklist**: Tích vào checklist khi làm xong để biết tiến độ
-3. **Đọc comments**: Comments giải thích rõ ràng bằng tiếng Việt
-4. **Nghỉ giải lao**: Nếu cảm thấy ngợp, nghỉ 5 phút rồi quay lại
-5. **Đọc ANALOGIES.md**: Giúp hiểu các khái niệm bằng ví dụ đời sống
+### 1. Làm theo flow - Don't jump around!
+```
+✅ ĐÚNG:
+   1. Đọc START_HERE.md
+   2. Chạy CLI hoặc Notebook
+   3. Đọc docs/ANALOGIES.md nếu không hiểu khái niệm
+
+❌ SAI:
+   - Nhảy lung tung → lạc lối nhanh!
+```
+
+### 2. Mỗi module 1 việc - Easy to find!
+
+| Cần làm gì? | Mở file nào? |
+|------------|--------------|
+| Đổi config? | `src/config.py` |
+| Đổi cách xử lý data? | `src/core/preprocessing.py` |
+| Đổi model? | `src/core/model.py` |
+| Đổi cách train? | `src/pipeline.py` |
+| Đổi CLI args? | `cli/main.py` |
+
+### 3. Đọc comments - Analogies everywhere!
+
+Tất cả file code có analogies (ví dụ đời sống) để dễ hiểu:
+- BiLSTM = "nhìn bản đồ 2 chiều"
+- Sliding Window = "nhìn qua cửa sổ lướt"
+- Scaling = "đổi đơn vị đo"
+
+---
+
+## ⚙️ Cấu Trúc Mới (Refactored)
+
+| Nguyên tắc | Nghĩa là gì? | Ví dụ đời sống |
+|------------|--------------|-----------------|
+| **KISS** | Keep It Simple, Stupid | "Làm đơn giản" - main.py từ 400 → 50 lines |
+| **DRY** | Don't Repeat Yourself | "Không lặp lại" - config ở 1 file |
+| **SoC** | Separation of Concerns | "Chia việc ra" - mỗi module 1 việc |
+
+---
 
 ## 🆘 Nếu Bị Lạc
 
-1. **Quên mình đang làm gì?** → Đọc lại `START_HERE.md`
-2. **Không hiểu code?** → Đọc `docs/ANALOGIES.md`
-3. **Gặp lỗi?** → Xem phần Troubleshooting trong `docs/SURVIVAL_GUIDE.md`
-4. **Muốn hiểu flow?** → Xem `docs/FLOW_DIAGRAM.md`
+### Quên mình đang làm gì?
+→ Đọc lại `START_HERE.md`
 
-## 📝 Lưu Ý
+### Không hiểu khái niệm?
+→ Đọc `docs/ANALOGIES.md`
 
-- **Mỗi folder chỉ làm 1 việc** - đừng lo lắng về việc code ở đâu
-- **Comments bằng tiếng Việt** - đọc comments để hiểu code
-- **Từng bước một** - không cần hiểu hết ngay, cứ làm từng bước
+### Gặp lỗi?
+→ Xem `docs/SURVIVAL_GUIDE.md`
 
+---
+
+## 📝 Lưu Ý Quan Trọng
+
+- ✅ **Mỗi folder chỉ làm 1 việc** (SoC)
+- ✅ **Config tập trung ở 1 nơi** (DRY)
+- ✅ **Code đơn giản, rõ ràng** (KISS)
+- ✅ **Comments bằng tiếng Việt** với analogies
+- ✅ **Từng bước một** - đừng nhảy cóc!
+
+---
+
+## 🎯 Bắt Đầu Ngay!
+
+Chọn 1 trong 2 cách:
+
+1. **Nếu bạn thích hướng dẫn chi tiết:**
+   → Đọc `START_HERE.md`
+   → Chạy notebook: `uv run jupyter notebook`
+
+2. **Nếu bạn thích nhanh gọn:**
+   → Chạy CLI: `uv run python -m cli.main --preset fast`

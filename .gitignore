@@ -11,7 +11,7 @@ wheels/
 .venv
 
 # Project-specific
-step1_data/cache/*.csv
+data/cache/*.csv
 reports/checkpoints/*.keras
 reports/main/
 reports/notebook/

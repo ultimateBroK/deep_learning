@@ -1,9 +1,9 @@
 """
-UTILS: CẤU HÌNH RUNTIME TENSORFLOW
-------------------------------------
+⚙️ TENSORFLOW RUNTIME CONFIGURATION
+-------------------------------------
 
 Giải thích bằng ví dụ đời sống:
-- TensorFlow có nhiều cách chạy (CPU, GPU, TPU)
+- Giống như "cài đặt game" - cấu hình để chạy mượt
 - Với CPU AMD, cần cấu hình số threads để tối ưu
 - Giống như bạn có 12 nhân CPU, nên tận dụng hết
 
@@ -16,10 +16,11 @@ Lưu ý:
 import os
 import random
 import warnings
+from typing import Optional
 
 import numpy as np
 
-# Suppress warnings trước khi import TensorFlow
+# Suppress warnings TRƯỚC khi import TensorFlow
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Chỉ hiển thị ERROR và WARNING nghiêm trọng
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Tắt oneDNN warnings
 
@@ -36,11 +37,15 @@ tf.get_logger().setLevel('ERROR')
 
 def set_random_seed(seed: int, deterministic: bool = False) -> None:
     """
-    Cố định ngẫu nhiên để kết quả chạy có thể tái lập.
+    Cố định ngẫu nhiên để kết quả chạy có thể tái lập
+
+    Giải thích bằng ví dụ đời sống:
+    - Giống như "seed trong game" - giống nhau → giống nhau
+    - Nếu seed = 42, lần nào chạy cũng ra kết quả giống nhau
 
     Args:
         seed: Số seed (ví dụ 42). Nếu seed < 0 thì không làm gì.
-        deterministic: Cố gắng bật deterministic ops (best-effort, tuỳ môi trường/TF version).
+        deterministic: Cố gắng bật deterministic ops (best-effort)
     """
     if seed is None or seed < 0:
         return
@@ -65,40 +70,47 @@ def set_random_seed(seed: int, deterministic: bool = False) -> None:
 def configure_tensorflow_runtime(
     intra_op_threads: int = 12,
     inter_op_threads: int = 2,
-    enable_xla: bool = True
+    enable_xla: bool = True,
+    use_gpu: bool = False
 ):
     """
     Cấu hình runtime TensorFlow cho CPU AMD
-    
+
+    Giải thích bằng ví dụ đời sống:
+    - Giống như "cấu hình game" - CPU dùng mấy thread?
+    - Intra-op: Các operations trong 1 layer song song
+    - Inter-op: Các layer khác nhau song song
+
     Args:
         intra_op_threads: Số thread cho operations song song (số core vật lý)
         inter_op_threads: Số thread cho operations song song khác
         enable_xla: Bật XLA optimization
+        use_gpu: Có dùng GPU không
     """
-    # Suppress warnings khi cấu hình
     old_level = tf.get_logger().level
     tf.get_logger().setLevel('ERROR')
-    
+
     try:
         # Cấu hình số threads
         tf.config.threading.set_intra_op_parallelism_threads(intra_op_threads)
         tf.config.threading.set_inter_op_parallelism_threads(inter_op_threads)
-        
+
         # Bật XLA optimization
         if enable_xla:
             os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
-        
-        # Chỉ chạy trên CPU (nếu có GPU thì ẩn đi; nếu không có GPU thì bỏ qua)
-        try:
-            gpus = tf.config.list_physical_devices('GPU')
-            if gpus:
-                tf.config.set_visible_devices([], 'GPU')
-        except Exception as e:
-            # Không để lỗi runtime nhỏ làm hỏng toàn pipeline
-            pass  # Suppress error message
+
+        # GPU handling
+        if not use_gpu:
+            # Chỉ chạy trên CPU (ẩn GPU nếu có)
+            try:
+                gpus = tf.config.list_physical_devices('GPU')
+                if gpus:
+                    tf.config.set_visible_devices([], 'GPU')
+            except Exception:
+                pass  # Suppress error message
     finally:
         tf.get_logger().setLevel(old_level)
-    
+
     # In thông tin cấu hình
     print("=" * 60)
     print("⚙️  CẤU HÌNH TENSORFLOW RUNTIME")
@@ -106,26 +118,25 @@ def configure_tensorflow_runtime(
     print(f"Intra-op threads: {intra_op_threads}")
     print(f"Inter-op threads: {inter_op_threads}")
     print(f"XLA enabled: {enable_xla}")
-    print("CPU only: True")
+    print(f"Use GPU: {use_gpu}")
     print("=" * 60 + "\n")
 
 
-def get_gpu_info():
+def get_gpu_info() -> bool:
     """
     Kiểm tra GPU có sẵn không
-    
+
     Returns:
         True nếu có GPU, False nếu không
     """
-    # Suppress warnings khi check GPU
     old_level = tf.get_logger().level
     tf.get_logger().setLevel('ERROR')
-    
+
     try:
         gpus = tf.config.list_physical_devices('GPU')
     finally:
         tf.get_logger().setLevel(old_level)
-    
+
     if gpus:
         print(f"✅ Tìm thấy {len(gpus)} GPU:")
         for gpu in gpus:
@@ -138,10 +149,14 @@ def get_gpu_info():
 
 def set_memory_growth():
     """
-    Cho phép GPU tự tăng bộ nhớ khi cần (tránh chiếm hết VRAM)
+    Cho phép GPU tự tăng bộ nhớ khi cần
+
+    Giải thích bằng ví dụ đời sống:
+    - Giống như "lựa phòng" - chiếm lúc cần, không phải lúc nào cũng chiếm hết
+    - Tránh chiếm hết VRAM ngay từ đầu
     """
     gpus = tf.config.list_physical_devices('GPU')
-    
+
     if gpus:
         try:
             for gpu in gpus:
@@ -162,7 +177,7 @@ def print_tensorflow_info():
     print(f"Keras version: {tf.keras.__version__}")
     print(f"Built with CUDA: {tf.test.is_built_with_cuda()}")
     print(f"GPU available: {get_gpu_info()}")
-    
+
     # CPU threads
     print(f"Intra-op threads: {tf.config.threading.get_intra_op_parallelism_threads()}")
     print(f"Inter-op threads: {tf.config.threading.get_inter_op_parallelism_threads()}")

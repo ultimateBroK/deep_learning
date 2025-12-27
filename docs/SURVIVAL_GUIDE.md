@@ -20,7 +20,7 @@ Giải thích chi tiết từng bước + Troubleshooting cho các vấn đề t
 ### Giải thích
 - **fetch_binance_data()**: (giữ tên cũ cho tương thích) nhưng thực tế là **đọc file CSV local**
 - **Dữ liệu mặc định**: `data/btc_1d_data_2018_to_2025.csv`
-- **Cache**: Lưu file CSV đã chuẩn hoá (datetime/open/high/low/close/volume) để lần sau đọc nhanh hơn
+- **Cache**: Lưu file CSV đã chuẩn hoá (datetime/open/high/low/close/volume) vào `data/cache/` để lần sau đọc nhanh hơn
 - **Timeframe**: Chỉ dùng để chọn file mặc định nếu không set `data_path` (1d/4h)
 
 ### Các tham số
@@ -42,7 +42,7 @@ DataFrame với các cột:
 
 ### Ví dụ code
 ```python
-from step1_data.fetch_data import fetch_binance_data
+from src.core import fetch_binance_data
 
 df = fetch_binance_data(
     data_path="data/btc_1d_data_2018_to_2025.csv",
@@ -118,7 +118,7 @@ Sample 3: Input: [20000, 25000, 30000] → Output: 35000
 
 ### Ví dụ code
 ```python
-from step2_preprocessing.prepare_data import prepare_data_for_lstm
+from src.core import prepare_data_for_lstm
 
 data_dict = prepare_data_for_lstm(
     df=df,
@@ -171,7 +171,7 @@ y_test = data_dict['y_test']
 
 ### Ví dụ code
 ```python
-from step3_model.bilstm import build_bilstm_model
+from src.core import build_bilstm_model
 
 input_shape = (60, 1)  # (window_size, n_features)
 model = build_bilstm_model(
@@ -217,7 +217,14 @@ model = build_bilstm_model(
 
 ### Ví dụ code
 ```python
-from step4_training.train import train_model
+from src.training import train_model
+from src import Config
+
+# Tạo Config object
+config = Config()
+config.training.epochs = 20
+config.training.batch_size = 32
+config.training.early_stopping_patience = 5
 
 train_result = train_model(
     model=model,
@@ -225,9 +232,7 @@ train_result = train_model(
     y_train=y_train,
     X_val=X_val,
     y_val=y_val,
-    epochs=20,
-    batch_size=32,
-    early_stopping_patience=5
+    config=config
 )
 
 history = train_result['history']
@@ -267,13 +272,14 @@ history = train_result['history']
 
 ### Ví dụ code
 ```python
-from step4_training.evaluate import evaluate_model, print_sample_predictions
+from src.core import evaluate_model, print_sample_predictions
 
 eval_result = evaluate_model(
     model=model,
     X_test=X_test,
     y_test=y_test,
-    scaler=scaler
+    scaler=scaler,
+    return_predictions=True
 )
 
 y_true = eval_result['y_true']
@@ -306,7 +312,7 @@ uv sync
 - Hoặc chỉ định rõ:
 
 ```bash
-uv run main.py --data-path data/btc_1d_data_2018_to_2025.csv
+uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 ```
 
 ---

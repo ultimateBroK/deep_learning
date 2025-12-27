@@ -25,7 +25,7 @@ Hiểu quy trình tổng thể của chương trình qua sơ đồ chi tiết.
 ┌─────────────────────────────────────────────────────────────────┐
 │  BƯỚC 1: ĐỌC DỮ LIỆU CSV (LOCAL)                                 │
 │  • Đọc data từ file CSV trong thư mục data/                      │
-│  • Cache (CSV đã chuẩn hoá) (optional)                           │
+│  • Cache (CSV đã chuẩn hoá) vào data/cache/ (optional)           │
 │  • Trả về DataFrame với: datetime, open, high, low, close, vol  │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
