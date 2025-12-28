@@ -1,5 +1,5 @@
 """
-⚙️ CONFIG TẬP TRUNG - CENTRALIZED CONFIGURATION
+CONFIG TẬP TRUNG - CENTRALIZED CONFIGURATION
 --------------------------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -242,32 +242,32 @@ class Config:
         """In tóm tắt config"""
         lines = [
             "=" * 70,
-            "⚙️  CONFIG SUMMARY",
+            "CONFIG SUMMARY",
             "=" * 70,
             "",
-            "📁 DATA:",
+            "DATA:",
             f"  File: {self.data.get_data_file()}",
             f"  Timeframe: {self.data.timeframe}",
             f"  Limit: {self.data.limit} lines",
             f"  Features: {self.data.features}",
             f"  Refresh cache: {self.data.refresh_cache}",
             "",
-            "🔧 PREPROCESSING:",
+            "PREPROCESSING:",
             f"  Window size: {self.preprocessing.window_size}",
             f"  Scaler: {self.preprocessing.scaler_type}",
             f"  Train/Val/Test: {self.preprocessing.train_ratio:.0%}/{self.preprocessing.val_ratio:.0%}/{(1-self.preprocessing.train_ratio-self.preprocessing.val_ratio):.0%}",
             "",
-            "🧠 MODEL:",
+            "MODEL:",
             f"  LSTM units: {self.model.lstm_units}",
             f"  Dropout: {self.model.dropout_rate}",
             f"  Dense units: {self.model.dense_units}",
             "",
-            "🏋️  TRAINING:",
+            "TRAINING:",
             f"  Epochs: {self.training.epochs}",
             f"  Batch size: {self.training.batch_size}",
             f"  Learning rate: {self.training.learning_rate}",
             "",
-            "⚡ RUNTIME:",
+            "RUNTIME:",
             f"  Intra-op threads: {self.runtime.intra_op_threads}",
             f"  Inter-op threads: {self.runtime.inter_op_threads}",
             f"  XLA: {self.runtime.enable_xla}",

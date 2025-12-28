@@ -1,40 +1,34 @@
-# 🎯 Hyperparameter Tuning Guide - Tìm Kết Quả Tốt Nhất
+# Hướng dẫn tuning (hyperparameter tuning)
 
-Tài liệu này cung cấp danh sách các lệnh với các tham số khác nhau để tìm ra cấu hình tốt nhất cho model BiLSTM dự đoán giá Bitcoin.
-
-> **[!IMPORTANT]**
-> Project tập trung vào **15m timeframe** với data khổng lồ (~280K dòng).
+Tài liệu này mô tả cách chạy thử nghiệm có hệ thống để chọn cấu hình phù hợp cho mô hình BiLSTM.
 
 ---
 
-## 📋 Mục Lục
+## Mục lục
 
-1. [Tổng Quan](#tổng-quan)
-2. [Danh Sách Presets (Khuyến Nghị)](#danh-sách-presets-khuyến-nghị)
-3. [Các Tham Số Quan Trọng](#các-tham-số-quan-trọng)
-4. [Chiến Lược Tuning](#chiến-lược-tuning)
-5. [Danh Sách Lệnh (Manual Tuning)](#danh-sách-lệnh-manual-tuning)
-6. [So Sánh Kết Quả](#so-sánh-kết-quả)
+1. [Tổng quan](#tổng-quan)
+2. [Danh sách preset](#danh-sách-presets-khuyến-nghị)
+3. [Tham số chính](#các-tham-số-quan-trọng)
+4. [Chiến lược tuning](#chiến-lược-tuning)
+5. [So sánh kết quả](#so-sánh-kết-quả)
 
 ---
 
-## 🎯 Tổng Quan
+## Tổng quan
 
 ### Mục Tiêu
-Tìm ra cấu hình tốt nhất bằng cách thử nghiệm các tổ hợp tham số khác nhau và so sánh kết quả (MAE, RMSE, MAPE, Direction Accuracy).
+Tìm cấu hình phù hợp bằng cách thử nghiệm các tổ hợp tham số và so sánh kết quả (MAE, RMSE, MAPE, Direction Accuracy).
 
 ### Quy Trình
 1. **Chọn preset phù hợp** (xem bảng bên dưới)
-2. **Chạy experiment** với preset hoặc tham số tùy chỉnh
-3. **Lưu kết quả** vào `reports/cli/` (tên folder tự động chứa timeframe và window_size)
+2. **Chạy thử nghiệm** với preset hoặc tham số tuỳ chỉnh
+3. **Lưu kết quả** vào `reports/cli/` (tên thư mục tự động chứa timeframe và window size)
 4. **So sánh metrics** từ các file `results_*.md`
-5. **Chọn cấu hình tốt nhất** dựa trên mục tiêu (MAE thấp nhất, Direction Accuracy cao nhất, v.v.)
+5. **Chọn cấu hình** theo mục tiêu (ví dụ MAE thấp, Direction Accuracy cao, hoặc cân bằng)
 
 ---
 
-## 📦 Danh Sách Presets (Khuyến Nghị)
-
-> **Tip:** Sử dụng preset có sẵn thay vì cấu hình thủ công - được tối ưu hóa cho từng mục đích!
+## Danh Sách Presets (Khuyến Nghị)
 
 | Preset | Limit | Window | Epochs | Mục đích | Khuyến nghị |
 |--------|-------|--------|--------|----------|-------------|
@@ -85,7 +79,7 @@ uv run python -m cli.main --preset 1h-light
 
 ---
 
-## 📊 Các Tham Số Quan Trọng
+## Các tham số chính
 
 ### 1. **Timeframe** (`--timeframe`)
 - **Ảnh hưởng**: Độ phân giải dữ liệu
@@ -144,7 +138,7 @@ uv run python -m cli.main --preset 1h-light
 
 ---
 
-## 🔬 Chiến Lược Tuning
+## Chiến Lược Tuning
 
 ### Chiến Lược 1: Grid Search (Tìm Toàn Diện)
 Thử tất cả tổ hợp tham số trong một phạm vi nhất định.
@@ -166,7 +160,7 @@ Dựa vào kinh nghiệm và kết quả trước đó để điều chỉnh t�
 
 ---
 
-## 📝 Ví dụ lệnh (đủ dùng, tránh dài dòng)
+## Ví dụ lệnh (đủ dùng, tránh dài dòng)
 
 ```bash
 # Baseline
@@ -183,7 +177,7 @@ uv run python -m cli.main --preset intraday-balanced --dropout 0.3
 
 ---
 
-## 📈 So Sánh Kết Quả
+## So Sánh Kết Quả
 
 ### Cách So Sánh
 
@@ -250,7 +244,7 @@ if __name__ == "__main__":
 
 ---
 
-## 💡 Tips & Best Practices
+## Gợi ý
 
 ### 1. **Bắt Đầu Từ Baseline**
 Luôn chạy baseline trước để có điểm so sánh.
@@ -277,7 +271,7 @@ Early stopping tự động dừng khi val_loss không cải thiện, giúp trá
 
 ---
 
-## 🎯 Kết Luận
+## Kết luận
 
 Sau khi chạy các experiments trên:
 
@@ -289,4 +283,4 @@ Sau khi chạy các experiments trên:
 
 3. **Sử dụng cấu hình tốt nhất** cho production hoặc tiếp tục fine-tune từ đó.
 
-**Chúc bạn tìm được cấu hình tốt nhất! 🚀**
+ 

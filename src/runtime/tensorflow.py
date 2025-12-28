@@ -1,5 +1,5 @@
 """
-⚙️ TENSORFLOW RUNTIME CONFIGURATION
+TENSORFLOW RUNTIME CONFIGURATION
 -------------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -113,7 +113,7 @@ def configure_tensorflow_runtime(
 
     # In thông tin cấu hình
     print("=" * 60)
-    print("⚙️  CẤU HÌNH TENSORFLOW RUNTIME")
+    print("CẤU HÌNH TENSORFLOW RUNTIME")
     print("=" * 60)
     print(f"Intra-op threads: {intra_op_threads}")
     print(f"Inter-op threads: {inter_op_threads}")
@@ -138,12 +138,12 @@ def get_gpu_info() -> bool:
         tf.get_logger().setLevel(old_level)
 
     if gpus:
-        print(f"✅ Tìm thấy {len(gpus)} GPU:")
+        print(f"Tìm thấy {len(gpus)} GPU:")
         for gpu in gpus:
             print(f"   - {gpu.name}")
         return True
     else:
-        print("ℹ️  Không tìm thấy GPU, sẽ dùng CPU")
+        print("Không tìm thấy GPU, sẽ dùng CPU")
         return False
 
 
@@ -161,9 +161,9 @@ def set_memory_growth() -> None:
         try:
             for gpu in gpus:
                 tf.config.experimental.set_memory_growth(gpu, True)
-            print("✅ Đã bật memory growth cho GPU")
+            print("Đã bật memory growth cho GPU")
         except RuntimeError as e:
-            print(f"❌ Lỗi khi cấu hình GPU: {e}")
+            print(f"Lỗi khi cấu hình GPU: {e}")
 
 
 def print_tensorflow_info() -> None:
@@ -171,7 +171,7 @@ def print_tensorflow_info() -> None:
     In thông tin về TensorFlow và runtime
     """
     print("\n" + "=" * 60)
-    print("📋 THÔNG TIN TENSORFLOW")
+    print("THÔNG TIN TENSORFLOW")
     print("=" * 60)
     print(f"TensorFlow version: {tf.__version__}")
     print(f"Keras version: {tf.keras.__version__}")

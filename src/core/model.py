@@ -1,5 +1,5 @@
 """
-🧠 MODEL MODULE - XÂY DỰNG MODEL BiLSTM
+MODEL MODULE - XÂY DỰNG MODEL BiLSTM
 ------------------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -101,7 +101,7 @@ def build_bilstm_model(
         metrics=['mae']  # Mean Absolute Error - dễ hiểu hơn
     )
 
-    print(f"✅ Đã build model BiLSTM với {len(lstm_units)} LSTM layers")
+    print(f"Đã build model BiLSTM với {len(lstm_units)} LSTM layers")
 
     return model
 
@@ -113,7 +113,7 @@ def print_model_summary(model: models.Sequential) -> None:
     Giải thích: Giống như "thông số kỹ thuật" - biết model có bao nhiêu layers, parameters
     """
     print("\n" + "=" * 60)
-    print("🧠 MODEL SUMMARY")
+    print("MODEL SUMMARY")
     print("=" * 60)
     model.summary()
     print("=" * 60)
@@ -123,7 +123,7 @@ def print_model_summary(model: models.Sequential) -> None:
     trainable_params = sum([tf.size(w).numpy() for w in model.trainable_weights])
     non_trainable_params = total_params - trainable_params
 
-    print("\n📊 Thống kê:")
+    print("\nThống kê:")
     print(f"   Total parameters: {total_params:,}")
     print(f"   Trainable: {trainable_params:,}")
     print(f"   Non-trainable: {non_trainable_params:,}")

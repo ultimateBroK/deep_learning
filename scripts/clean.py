@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🧹 CLEAN SCRIPT - DỌN DẸP PROJECT
+CLEAN SCRIPT - DỌN DẸP PROJECT
 -------------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -38,7 +38,7 @@ def get_age_days(p: Path) -> float:
 def print_header(title: str, rel_path: Path):
     """In header cho từng loại dọn dẹp"""
     print(f"\n{'='*60}")
-    print(f"📁 {title} ({rel_path})")
+    print(f"{title} ({rel_path})")
     print(f"{'='*60}")
 
 
@@ -51,9 +51,9 @@ def print_item(p: Path, size_mb: float, age_days: float, indent: str = "  "):
 def print_summary(count: int, size_mb: float, item_type: str = "items", dry_run: bool = True):
     """In tổng kết"""
     print("=" * 60)
-    print(f"🗑️  Tổng: {count} {item_type}, {size_mb:.2f} MB")
+    print(f"Tổng: {count} {item_type}, {size_mb:.2f} MB")
     if dry_run:
-        print("💡 DRY-RUN: Sử dụng --execute để thực sự xóa")
+        print("DRY-RUN: Sử dụng --execute để thực sự xóa")
     print("=" * 60 + "\n")
 
 
@@ -63,7 +63,7 @@ def clean_cache(*, force: bool = False, older_than_days: int = 30, dry_run: bool
     cache_dir = Paths().cache_dir
 
     if not cache_dir.exists():
-        print("✅ Không có thư mục cache")
+        print("Không có thư mục cache")
         return 0, 0.0
 
     candidates: list[Path] = []
@@ -73,7 +73,7 @@ def clean_cache(*, force: bool = False, older_than_days: int = 30, dry_run: bool
             candidates.append(file_path)
 
     if not candidates:
-        print("✅ Không có file cache nào để xóa")
+        print("Không có file cache nào để xóa")
         return 0, 0.0
 
     print_header("CACHE DATA", cache_dir.relative_to(BASE))
@@ -90,7 +90,7 @@ def clean_cache(*, force: bool = False, older_than_days: int = 30, dry_run: bool
             try:
                 file_path.unlink()
             except Exception as e:
-                print(f"      ⚠️  Lỗi: {e}")
+                print(f"      Lỗi: {e}")
                 continue
 
         removed_count += 1
@@ -105,7 +105,7 @@ def clean_reports(*, keep: int = 5, dry_run: bool = True) -> tuple[int, float]:
     reports_dir = BASE / "reports"
 
     if not reports_dir.exists():
-        print("✅ Không có thư mục reports")
+        print("Không có thư mục reports")
         return 0, 0.0
 
     removed_count = 0
@@ -138,7 +138,7 @@ def clean_reports(*, keep: int = 5, dry_run: bool = True) -> tuple[int, float]:
                 try:
                     shutil.rmtree(folder)
                 except Exception as e:
-                    print(f"      ⚠️  Lỗi: {e}")
+                    print(f"      Lỗi: {e}")
                     removed_count -= 1
                     total_size_mb -= size_mb
                     continue
@@ -147,7 +147,7 @@ def clean_reports(*, keep: int = 5, dry_run: bool = True) -> tuple[int, float]:
 
         print_summary(removed_count, total_size_mb, "folders", dry_run)
     else:
-        print("✅ Không có báo cáo nào để xóa")
+        print("Không có báo cáo nào để xóa")
 
     return removed_count, total_size_mb
 
@@ -157,7 +157,7 @@ def clean_checkpoints(*, keep_best: bool = True, dry_run: bool = True) -> tuple[
     checkpoint_dir = BASE / "models" / "checkpoints"
 
     if not checkpoint_dir.exists():
-        print("✅ Không có thư mục checkpoints")
+        print("Không có thư mục checkpoints")
         return 0, 0.0
 
     removed_count = 0
@@ -183,7 +183,7 @@ def clean_checkpoints(*, keep_best: bool = True, dry_run: bool = True) -> tuple[
                 try:
                     file_path.unlink()
                 except Exception as e:
-                    print(f"      ⚠️  Lỗi: {e}")
+                    print(f"      Lỗi: {e}")
                     removed_count -= 1
                     total_size_mb -= size_mb
                     continue
@@ -192,7 +192,7 @@ def clean_checkpoints(*, keep_best: bool = True, dry_run: bool = True) -> tuple[
 
         print_summary(removed_count, total_size_mb, "files", dry_run)
     else:
-        print("✅ Không có checkpoint nào để xóa")
+        print("Không có checkpoint nào để xóa")
 
     return removed_count, total_size_mb
 
@@ -245,11 +245,11 @@ def main():
         args.keep = args.keep_reports
 
     print("\n" + "="*60)
-    print("🧹 DỌN DẸP PROJECT")
+    print("DỌN DẸP PROJECT")
     print("="*60)
     print(f"Mode: {'DRY-RUN (chỉ xem)' if dry_run else 'EXECUTE (thực sự xóa)'}")
     if dry_run:
-        print("💡 Sử dụng --execute để thực sự xóa")
+        print("Sử dụng --execute để thực sự xóa")
     print("="*60 + "\n")
 
     total_count = 0
@@ -276,7 +276,7 @@ def main():
 
     # Tổng kết
     print("\n" + "="*60)
-    print("📊 TỔNG KẾT QUẢ")
+    print("TỔNG KẾT QUẢ")
     print("="*60)
     print(f"Total: {total_count} items, {total_size_mb:.2f} MB")
 
@@ -284,11 +284,11 @@ def main():
         print(f"       (~{total_size_mb / 1024:.2f} GB)")
 
     if dry_run and total_count > 0:
-        print("\n💡 Sử dụng --execute để thực sự xóa")
+        print("\nSử dụng --execute để thực sự xóa")
     elif total_count == 0:
-        print("\n✅ Không có gì để xóa!")
+        print("\nKhông có gì để xóa!")
     else:
-        print(f"\n✅ Đã xóa {total_count} items!")
+        print(f"\nĐã xóa {total_count} items!")
 
     print("="*60 + "\n")
 

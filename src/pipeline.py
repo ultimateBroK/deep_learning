@@ -1,5 +1,5 @@
 """
-🔄 PIPELINE MODULE - PIPELINE CHÍNH
+PIPELINE MODULE - PIPELINE CHÍNH
 ------------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -8,12 +8,12 @@ Giải thích bằng ví dụ đời sống:
 - Data → Preprocessing → Model → Training → Evaluation → Results
 
 Flow:
-1. 📥 STEP 1: Load data
-2. 🔧 STEP 2: Preprocess data
-3. 🧠 STEP 3: Build model
-4. 🏋️ STEP 4: Train model
-5. 📊 STEP 5: Evaluate & visualize
-6. 💾 STEP 6: Save results
+1. STEP 1: Load data
+2. STEP 2: Preprocess data
+3. STEP 3: Build model
+4. STEP 4: Train model
+5. STEP 5: Evaluate & visualize
+6. STEP 6: Save results
 
 Trách nhiệm (SoC):
 - Orchestrate toàn bộ process
@@ -81,12 +81,12 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
 
     # 3. STEP 1: LOAD DATA
     print("\n" + "=" * 70)
-    print("📥 BƯỚC 1: LOAD DỮ LIỆU")
+    print("BƯỚC 1: LOAD DỮ LIỆU")
     print("=" * 70 + "\n")
 
     data_file = config.data.get_data_file()
-    print(f"📄 Data file: {data_file}")
-    print(f"🕒 Timeframe: {config.data.timeframe}\n")
+    print(f"Data file: {data_file}")
+    print(f"Timeframe: {config.data.timeframe}\n")
 
     df = fetch_binance_data(
         data_path=str(data_file),
@@ -108,7 +108,7 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
 
     # 4. STEP 2: PREPROCESS DATA
     print("\n" + "=" * 70)
-    print("🔧 BƯỚC 2: XỬ LÝ DỮ LIỆU")
+    print("BƯỚC 2: XỬ LÝ DỮ LIỆU")
     print("=" * 70 + "\n")
 
     data_dict = prepare_data_for_lstm(
@@ -130,7 +130,7 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
 
     # 5. STEP 3: BUILD MODEL
     print("\n" + "=" * 70)
-    print("🧠 BƯỚC 3: XÂY DỰNG MODEL BiLSTM")
+    print("BƯỚC 3: XÂY DỰNG MODEL BiLSTM")
     print("=" * 70 + "\n")
 
     input_shape = config.model.get_input_shape(
@@ -149,7 +149,7 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
 
     # 6. STEP 4: TRAIN MODEL
     print("\n" + "=" * 70)
-    print("🏋️  BƯỚC 4: TRAINING MODEL")
+    print("BƯỚC 4: TRAINING MODEL")
     print("=" * 70 + "\n")
 
     train_result = train_model(
@@ -165,7 +165,7 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
 
     # 7. STEP 5: EVALUATE & VISUALIZE
     print("\n" + "=" * 70)
-    print("📊 BƯỚC 5: ĐÁNH GIÁ & VẼ BIỂU ĐỒ")
+    print("BƯỚC 5: ĐÁNH GIÁ & VẼ BIỂU ĐỒ")
     print("=" * 70 + "\n")
 
     eval_result = evaluate_model(
@@ -186,7 +186,7 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
 
     # 8. STEP 6: SAVE RESULTS
     print("\n" + "=" * 70)
-    print("💾 LƯU KẾT QUẢ")
+    print("LƯU KẾT QUẢ")
     print("=" * 70 + "\n")
 
     # Tạo config dict để đặt tên folder (đồng bộ với notebook: chỉ dùng 3 tham số cơ bản)
@@ -196,7 +196,7 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
         'limit': config.data.limit,
     }
     results_folder = create_results_folder(run_type=run_type, config=folder_config)
-    print(f"\n📁 Folder kết quả: {results_folder}\n")
+    print(f"\nFolder kết quả: {results_folder}\n")
 
     # Vẽ và lưu biểu đồ
     # Lấy timestamp từ tên folder (2 phần cuối: YYYYMMDD_HHMMSS)
@@ -258,9 +258,9 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
 
     # 9. SUMMARY
     print("\n" + "=" * 70)
-    print("✅ HOÀN THÀNH!")
+    print("HOÀN THÀNH")
     print("=" * 70)
-    print(f"📊 Báo cáo: {results_folder / f'results_BiLSTM_{timestamp_suffix}.md'}")
+    print(f"Báo cáo: {results_folder / f'results_BiLSTM_{timestamp_suffix}.md'}")
     print("=" * 70 + "\n")
 
     return {

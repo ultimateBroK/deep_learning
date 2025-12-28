@@ -1,5 +1,5 @@
 """
-🔧 PREPROCESSING MODULE - XỬ LÝ DỮ LIỆU
+PREPROCESSING MODULE - XỬ LÝ DỮ LIỆU
 -----------------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -97,7 +97,7 @@ def split_data(
     val = data[train_end:val_end]
     test = data[val_end:]
 
-    print("✅ Chia dữ liệu:")
+    print("Chia dữ liệu:")
     print(f"   Train: {len(train)} mẫu ({train_ratio:.0%})")
     print(f"   Val:   {len(val)} mẫu ({val_ratio:.0%})")
     print(f"   Test:  {len(test)} mẫu ({(1-train_ratio-val_ratio):.0%})")
@@ -148,7 +148,7 @@ class DataScaler:
 
         scaled_data = self.scaler.fit_transform(data)
 
-        print(f"✅ Đã fit và transform dữ liệu với {self.scaler_type} scaler")
+        print(f"Đã fit và transform dữ liệu với {self.scaler_type} scaler")
         print(f"   Min: {scaled_data.min():.4f}, Max: {scaled_data.max():.4f}")
 
         return scaled_data
@@ -234,13 +234,13 @@ def prepare_data_for_lstm(
         features = ["close"]
     
     print("\n" + "=" * 70)
-    print("🔧 CHUẨN BỊ DỮ LIỆU CHO LSTM")
+    print("CHUẨN BỊ DỮ LIỆU CHO LSTM")
     print("=" * 70 + "\n")
 
     # 1. Lấy features từ DataFrame
     feature_data = df.select(features).to_numpy()
 
-    print(f"📊 Shape dữ liệu gốc: {feature_data.shape}")
+    print(f"Shape dữ liệu gốc: {feature_data.shape}")
     print(f"   Features: {features}")
 
     # 2. Scaling
@@ -255,7 +255,7 @@ def prepare_data_for_lstm(
     X_val, y_val = create_windows(val_data, window_size)
     X_test, y_test = create_windows(test_data, window_size)
 
-    print("\n✅ Dữ liệu sau khi tạo windows:")
+    print("\nDữ liệu sau khi tạo windows:")
     print(f"   X_train: {X_train.shape}, y_train: {y_train.shape}")
     print(f"   X_val:   {X_val.shape}, y_val: {y_val.shape}")
     print(f"   X_test:  {X_test.shape}, y_test: {y_test.shape}")

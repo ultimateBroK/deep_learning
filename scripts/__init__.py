@@ -1,5 +1,5 @@
 """
-🔧 SCRIPTS MODULE - UTILITY SCRIPTS
+SCRIPTS MODULE - UTILITY SCRIPTS
 --------------------------------------
 
 Các script utility cho project:

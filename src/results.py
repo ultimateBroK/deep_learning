@@ -1,5 +1,5 @@
 """
-💾 RESULTS MODULE - LƯU KẾT QUẢ
+RESULTS MODULE - LƯU KẾT QUẢ
 ----------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -185,7 +185,7 @@ def save_config(
     config_path = folder_path / "config.json"
     with open(config_path, 'w') as f:
         json.dump(_to_jsonable(config), f, indent=2)
-    print(f"💾 Đã lưu config: {config_path}")
+    print(f"Đã lưu config: {config_path}")
 
 
 def save_metrics(
@@ -202,7 +202,7 @@ def save_metrics(
     metrics_path = folder_path / "metrics.json"
     with open(metrics_path, 'w') as f:
         json.dump(_to_jsonable(metrics), f, indent=2)
-    print(f"💾 Đã lưu metrics: {metrics_path}")
+    print(f"Đã lưu metrics: {metrics_path}")
 
 
 def save_markdown_report(
@@ -234,7 +234,7 @@ def save_markdown_report(
     content = f"# Kết quả dự đoán giá Bitcoin - BiLSTM\n\n**Timestamp:** {now_str}\n\n---\n\n"
 
     # Cấu hình
-    content += "## ⚙️ Cấu hình & Dữ liệu\n\n"
+    content += "## Cấu hình & Dữ liệu\n\n"
     content += "| Tham số | Giá trị |\n|---|---|\n"
     for k, v in config.items():
         if v is not None and not k.startswith('_'):
@@ -243,7 +243,7 @@ def save_markdown_report(
 
     # Metrics
     if metrics:
-        content += "## 📊 Kết quả Đánh Giá\n\n"
+        content += "## Kết quả Đánh Giá\n\n"
         content += "| Metric | Giá trị |\n|---|---|\n"
         if "mae" in metrics:
             content += f"| MAE | ${metrics['mae']:.2f} |\n"
@@ -257,7 +257,7 @@ def save_markdown_report(
 
     # Training history
     if history:
-        content += "## 🏋️ Training History\n\n"
+        content += "## Training History\n\n"
         content += "| Metric | Final |\n|---|---|\n"
         if 'loss' in history:
             content += f"| Train Loss | {history['loss'][-1]:.6f} |\n"
@@ -271,7 +271,7 @@ def save_markdown_report(
 
     # Plots
     if plots:
-        content += "## 📈 Biểu Đồ / Plots\n\n"
+        content += "## Biểu Đồ / Plots\n\n"
         for plot_name, plot_file in plots.items():
             content += f"- **{plot_name}**: `{plot_file}`\n"
         content += "\n"
@@ -281,7 +281,7 @@ def save_markdown_report(
     with open(report_path, 'w') as f:
         f.write(content)
 
-    print(f"💾 Đã lưu báo cáo: {report_path}")
+    print(f"Đã lưu báo cáo: {report_path}")
 
 
 def clean_old_reports(
@@ -323,9 +323,9 @@ def clean_old_reports(
         deleted_count += 1
 
     if deleted_count > 0:
-        print(f"🗑️  Đã xóa {deleted_count} báo cáo cũ")
+        print(f"Đã xóa {deleted_count} báo cáo cũ")
     else:
-        print("✅ Không có báo cáo cũ nào để xóa")
+        print("Không có báo cáo cũ nào để xóa")
 
     return deleted_count
 

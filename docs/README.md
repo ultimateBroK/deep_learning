@@ -1,18 +1,18 @@
-# 📚 Docs index
+# Index tài liệu
 
-Mục tiêu: **ít file hơn, mỗi file một vai trò**, không lặp nội dung.
+Mục tiêu: **ít file hơn**, mỗi file một vai trò, tránh lặp nội dung.
 
-## Bắt đầu nhanh
+## Bắt đầu
 
-- **Luồng chạy 1 trang**: `docs/WORKFLOW.md`
-- **Onboarding chi tiết**: `START_HERE.md`
+- Workflow (1 trang): `docs/WORKFLOW.md`
+- Hướng dẫn bắt đầu: `START_HERE.md`
 
-## Tài liệu “canonical”
+## Tài liệu chính
 
-- **Khái niệm (LSTM/BiLSTM, window, scaling, loss/metrics, overfitting)**: `docs/CONCEPTS.md`
-- **Flow của pipeline**: `docs/FLOW_DIAGRAM.md`
-- **Presets & tuning**: `docs/HYPERPARAMETER_TUNING.md`
-- **Troubleshooting / runbook**: `docs/SURVIVAL_GUIDE.md`
+- Khái niệm (window size, scaling, metrics, LSTM/BiLSTM, overfitting): `docs/CONCEPTS.md`
+- Sơ đồ luồng xử lý: `docs/FLOW_DIAGRAM.md`
+- Preset và tuning: `docs/HYPERPARAMETER_TUNING.md`
+- Hướng dẫn xử lý sự cố: `docs/SURVIVAL_GUIDE.md`
 
 ## Kết quả & đánh giá
 

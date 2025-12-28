@@ -1,5 +1,5 @@
 """
-🎯 SOURCE PACKAGE
+SOURCE PACKAGE
 ------------------
 
 Package chính của project.

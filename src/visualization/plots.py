@@ -1,5 +1,5 @@
 """
-📊 PLOTS MODULE - VẼ BIỂU ĐỒ
+PLOTS MODULE - VẼ BIỂU ĐỒ
 ------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -60,7 +60,7 @@ def plot_training_history(history, save_path: Optional[str] = None) -> None:
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"💾 Đã lưu training history plot: {save_path}")
+        print(f"Đã lưu training history plot: {save_path}")
 
     plt.show()
 
@@ -114,7 +114,7 @@ def plot_predictions(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"💾 Đã lưu predictions plot: {save_path}")
+        print(f"Đã lưu predictions plot: {save_path}")
 
     plt.show()
 
@@ -160,7 +160,7 @@ def plot_residuals(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"💾 Đã lưu residuals plot: {save_path}")
+        print(f"Đã lưu residuals plot: {save_path}")
 
     plt.show()
 
@@ -194,7 +194,7 @@ def plot_price_history(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"💾 Đã lưu price history plot: {save_path}")
+        print(f"Đã lưu price history plot: {save_path}")
 
     plt.show()
 
@@ -264,7 +264,7 @@ def plot_all_in_one(
 
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"💾 Đã lưu all-in-one plot: {save_path}")
+        print(f"Đã lưu all-in-one plot: {save_path}")
 
     plt.show()
 

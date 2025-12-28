@@ -1,26 +1,26 @@
-# 📖 Survival Guide - Hướng Dẫn Sống Còn
+# Hướng dẫn xử lý sự cố
 
-Giải thích chi tiết từng bước + Troubleshooting cho các vấn đề thường gặp.
+Tài liệu này mô tả các bước chạy chính và cách xử lý các lỗi thường gặp.
 
 ---
 
-## 📋 Chỉ Mục
+## Mục lục
 
-- [Bước 1: Đọc dữ liệu từ CSV (local)](#bước-1-đọc-dữ-liệu-từ-csv-local)
+- [Bước 1: Đọc dữ liệu từ CSV](#bước-1-đọc-dữ-liệu-từ-csv-local)
 - [Bước 2: Xử lý dữ liệu](#bước-2-xử-lý-dữ-liệu)
 - [Bước 3: Xây dựng model BiLSTM](#bước-3-xây-dựng-model-bilstm)
 - [Bước 4: Training model](#bước-4-training-model)
 - [Bước 5: Đánh giá & Vẽ biểu đồ](#bước-5-đánh-giá--vẽ-biểu-đồ)
-- [Troubleshooting](#troubleshooting)
+- [Xử lý sự cố](#xử-lý-sự-cố)
 
 ---
 
-## Bước 1: Đọc Dữ Liệu Từ CSV (Local)
+## Bước 1: Đọc dữ liệu từ CSV
 
 ### Giải thích
-- **fetch_binance_data()**: (giữ tên cũ cho tương thích) nhưng thực tế là **đọc file CSV local**
+- **fetch_binance_data()**: giữ tên cũ để tương thích; thực tế là đọc file CSV
 - **Dữ liệu mặc định**: `data/btc_15m_data_2018_to_2025.csv` (tập trung 15m)
-- **Cache**: Lưu file CSV đã chuẩn hoá (datetime/open/high/low/close/volume) vào `data/cache/` để lần sau đọc nhanh hơn
+- **Cache**: Lưu CSV đã chuẩn hoá (datetime/open/high/low/close/volume) vào `data/cache/` để lần sau đọc nhanh hơn
 - **Timeframe**: Chỉ dùng để chọn file mặc định nếu không set `data_path` (15m/1h/4h/1d)
 
 ### Các tham số
@@ -113,8 +113,8 @@ Sample 3: Input: [20000, 25000, 30000] → Output: 35000
 - Test set như "đề thi cuối kỳ" - model chưa bao giờ thấy
 
 #### Lưu ý quan trọng
-- ❌ KHÔNG shuffle data khi split (vì là time series!)
-- ✅ Phải giữ nguyên thứ tự thời gian
+- KHÔNG shuffle data khi split (vì là time series!)
+- Phải giữ nguyên thứ tự thời gian
 
 ### Ví dụ code
 ```python
@@ -265,10 +265,10 @@ history = train_result['history']
 
 | MAE | RMSE | MAPE | Đánh giá |
 |-----|------|------|----------|
-| < $200 | < $300 | < 1% | 🏆 Tuyệt vời |
-| $200-$500 | $300-$800 | 1-2% | ✅ Tốt |
-| $500-$1000 | $800-$1500 | 2-5% | ⚠️ Trung bình |
-| > $1000 | > $1500 | > 5% | ❌ Kém |
+| < $200 | < $300 | < 1% | Tuyệt vời |
+| $200-$500 | $300-$800 | 1-2% | Tốt |
+| $500-$1000 | $800-$1500 | 2-5% | Trung bình |
+| > $1000 | > $1500 | > 5% | Kém |
 
 ### Ví dụ code
 ```python
@@ -290,9 +290,9 @@ print_sample_predictions(y_true, y_pred, n_samples=10)
 
 ---
 
-## Troubleshooting
+## Xử lý sự cố
 
-### ❌ Lỗi 1: "No module named 'tensorflow'" (hoặc polars/numpy)
+### Lỗi 1: "No module named 'tensorflow'" (hoặc polars/numpy)
 
 **Nguyên nhân**: Chưa cài dependencies
 
@@ -303,7 +303,7 @@ uv sync
 
 ---
 
-### ❌ Lỗi 2: "FileNotFoundError: Không tìm thấy file data"
+### Lỗi 2: "FileNotFoundError: Không tìm thấy file data"
 
 **Nguyên nhân**: `--data-path` trỏ sai, hoặc bạn chưa có file CSV trong `data/`
 
@@ -317,7 +317,7 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-### ❌ Lỗi 3: "CSV thiếu cột bắt buộc"
+### Lỗi 3: "CSV thiếu cột bắt buộc"
 
 **Nguyên nhân**: File CSV không đúng format (cần có các cột kiểu Binance export: `Open time`, `Open`, `High`, `Low`, `Close`, `Volume`)
 
@@ -327,7 +327,7 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-### ❌ Lỗi 4: Overfitting (Train loss thấp, Val loss cao)
+### Lỗi 4: Overfitting (Train loss thấp, Val loss cao)
 
 **Nguyên nhân**: Model học vẹt data training
 
@@ -339,7 +339,7 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-### ❌ Lỗi 5: Underfitting (Cả train và val loss đều cao)
+### Lỗi 5: Underfitting (Cả train và val loss đều cao)
 
 **Nguyên nhân**: Model quá đơn giản, không học được pattern
 
@@ -351,7 +351,7 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-### ❌ Lỗi 5: Model không converge (loss dao động)
+### Lỗi 6: Model không converge (loss dao động)
 
 **Nguyên nhân**: Learning rate quá lớn
 
@@ -361,7 +361,7 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-### ❌ Lỗi 6: Out of Memory (OOM)
+### Lỗi 7: Out of Memory (OOM)
 
 **Nguyên nhân**: Batch size quá lớn hoặc data quá nhiều
 
@@ -372,7 +372,7 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-### ❌ Lỗi 7: Kết quả dự đoán rất kém
+### Lỗi 8: Kết quả dự đoán rất kém
 
 **Nguyên nhân có thể**:
 1. Data quá ít (< 10000 samples cho 15m)
@@ -388,7 +388,7 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-### ❌ Lỗi 8: GPU không được sử dụng
+### Lỗi 9: GPU không được sử dụng
 
 **Nguyên nhân**: TensorFlow không tìm thấy GPU
 
@@ -398,7 +398,7 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-## 💡 Tips & Tricks
+## Gợi ý
 
 1. **Luôn dùng cache**: Đừng tải lại data mỗi lần chạy
 2. **Bắt đầu với config đơn giản**: 1-2 LSTM layers, 32-64 units
@@ -408,10 +408,10 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 ---
 
-## 🎯 Kết Luận
+## Kết luận
 
-Nếu bạn theo dõi từng bước và gặp vấn đề:
-1. Đọc lại phần tương ứng trong file này
-2. Đọc `docs/CONCEPTS.md` để hiểu khái niệm
-3. Xem error message và tìm trong Troubleshooting
+Nếu gặp vấn đề:
+1. Đọc lại phần liên quan trong file này
+2. Tham khảo `docs/CONCEPTS.md` nếu cần giải thích thuật ngữ
+3. Tìm lỗi trong mục “Xử lý sự cố”
 

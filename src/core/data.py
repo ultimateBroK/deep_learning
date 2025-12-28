@@ -1,5 +1,5 @@
 """
-📥 DATA MODULE - ĐỌC DỮ LIỆU
+DATA MODULE - ĐỌC DỮ LIỆU
 --------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -170,12 +170,12 @@ def fetch_binance_data(
 
     # Đọc từ cache nếu có
     if save_cache and cache_path.exists():
-        print(f"📂 Đang đọc dữ liệu từ cache: {cache_path}")
+        print(f"Đang đọc dữ liệu từ cache: {cache_path}")
         df = pl.read_csv(cache_path, try_parse_dates=True)
         return df
 
-    print(f"📥 Đang đọc dữ liệu từ CSV: {data_file}")
-    print(f"🕒 Timeframe (từ tên file): {inferred_tf}")
+    print(f"Đang đọc dữ liệu từ CSV: {data_file}")
+    print(f"Timeframe (từ tên file): {inferred_tf}")
 
     raw = pl.read_csv(data_file)
     df = _normalize_binance_export_csv(raw)
@@ -192,9 +192,9 @@ def fetch_binance_data(
     # Lưu cache
     if save_cache:
         df.write_csv(cache_path)
-        print(f"💾 Đã lưu cache vào: {cache_path}")
+        print(f"Đã lưu cache vào: {cache_path}")
 
-    print(f"✅ Đã tải {len(df)} dòng dữ liệu")
+    print(f"Đã tải {len(df)} dòng dữ liệu")
     try:
         print(f"   Thời gian: {df.select('datetime').row(0)[0]} đến {df.select('datetime').row(-1)[0]}")
     except Exception:
@@ -238,9 +238,9 @@ def clear_cache(cache_dir: Optional[Path] = None, older_than_days: Optional[int]
                 deleted_count += 1
 
     if deleted_count > 0:
-        print(f"🗑️  Đã xóa {deleted_count} file cache")
+        print(f"Đã xóa {deleted_count} file cache")
     else:
-        print("✅ Không có file cache nào để xóa")
+        print("Không có file cache nào để xóa")
 
     return deleted_count
 

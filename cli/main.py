@@ -1,5 +1,5 @@
 """
-🎯 ENTRY POINT - CLI MAIN
+ENTRY POINT - CLI MAIN
 ---------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -70,7 +70,7 @@ Ví dụ:
     )
 
     # ==================== DATA ARGS ====================
-    data_group = parser.add_argument_group("📥 Data", "Dữ liệu đầu vào")
+    data_group = parser.add_argument_group("Data", "Dữ liệu đầu vào")
 
     data_group.add_argument(
         '--data-path',
@@ -105,7 +105,7 @@ Ví dụ:
     )
 
     # ==================== PREPROCESSING ARGS ====================
-    prep_group = parser.add_argument_group("🔧 Preprocessing", "Xử lý dữ liệu")
+    prep_group = parser.add_argument_group("Preprocessing", "Xử lý dữ liệu")
 
     prep_group.add_argument(
         '--window',
@@ -122,7 +122,7 @@ Ví dụ:
     )
 
     # ==================== MODEL ARGS ====================
-    model_group = parser.add_argument_group("🧠 Model", "Cấu hình model")
+    model_group = parser.add_argument_group("Model", "Cấu hình model")
 
     model_group.add_argument(
         '--lstm-units',
@@ -139,7 +139,7 @@ Ví dụ:
     )
 
     # ==================== TRAINING ARGS ====================
-    train_group = parser.add_argument_group("🏋️ Training", "Huấn luyện model")
+    train_group = parser.add_argument_group("Training", "Huấn luyện model")
 
     train_group.add_argument(
         '--epochs',
@@ -167,7 +167,7 @@ Ví dụ:
     )
 
     # ==================== RUNTIME ARGS ====================
-    runtime_group = parser.add_argument_group("⚡ Runtime", "Cấu hình runtime")
+    runtime_group = parser.add_argument_group("Runtime", "Cấu hình runtime")
 
     runtime_group.add_argument(
         '--intra-threads',
@@ -189,7 +189,7 @@ Ví dụ:
     )
 
     # ==================== PRESET ====================
-    preset_group = parser.add_argument_group("📦 Preset", "Cấu hình có sẵn")
+    preset_group = parser.add_argument_group("Preset", "Cấu hình có sẵn")
 
     preset_group.add_argument(
         '--preset',
@@ -284,7 +284,7 @@ def main():
     print("\n" + "=" * 70)
     print(" " * 15 + "DỰ BÁO GIÁ BITCOIN VỚI BiLSTM")
     print("=" * 70)
-    print(f"📦 Preset: {args.preset}")
+    print(f"Preset: {args.preset}")
     print("=" * 70)
 
     # In config summary

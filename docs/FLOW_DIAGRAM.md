@@ -1,16 +1,16 @@
-# 📊 Flow Diagram - Sơ Đồ Flow Chương Trình
+# Sơ đồ luồng xử lý (flow)
 
-Hiểu quy trình tổng thể của chương trình qua sơ đồ chi tiết.
+Mô tả luồng xử lý chính của project.
 
 ---
 
-## 📋 Chỉ Mục
+## Mục lục
 
-- [Flow Tổng Quan](#flow-tổng-quan)
-- [Flow Chi Tiết Từng Bước](#flow-chi-tiết-từng-bước)
-- [Data Flow](#data-flow)
-- [Training Flow](#training-flow)
-- [Evaluation Flow](#evaluation-flow)
+- [Luồng tổng quan](#flow-tổng-quan)
+- [Luồng chi tiết từng bước](#flow-chi-tiết-từng-bước)
+- [Luồng dữ liệu](#data-flow)
+- [Luồng training](#training-flow)
+- [Luồng đánh giá](#evaluation-flow)
 
 ---
 
@@ -452,7 +452,7 @@ Best val_loss: 0.00150
 
 ---
 
-## 🎯 Tóm Tắt
+## Tóm tắt
 
 Quy trình tổng thể:
 

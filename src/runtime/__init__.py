@@ -1,5 +1,5 @@
 """
-⚡ RUNTIME MODULE - CẤU HÌNH RUNTIME
+RUNTIME MODULE - CẤU HÌNH RUNTIME
 ------------------------------------
 
 Giải thích bằng ví dụ đời sống:

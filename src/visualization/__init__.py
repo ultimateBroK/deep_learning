@@ -1,5 +1,5 @@
 """
-📊 VISUALIZATION MODULE - VẼ BIỂU ĐỒ
+VISUALIZATION MODULE - VẼ BIỂU ĐỒ
 --------------------------------------
 
 Giải thích bằng ví dụ đời sống:

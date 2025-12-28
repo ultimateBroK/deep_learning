@@ -1,5 +1,5 @@
 """
-🏋️ TRAINING MODULE - HUẤN LUYỆN MODEL
+TRAINING MODULE - HUẤN LUYỆN MODEL
 -----------------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -86,7 +86,7 @@ def train_model(
     callbacks = [checkpoint_callback, early_stop_callback, reduce_lr_callback]
 
     print("\n" + "=" * 70)
-    print("🚀 BẮT ĐẦU TRAINING")
+    print("BẮT ĐẦU TRAINING")
     print("=" * 70)
     print(f"Epochs: {config.training.epochs}")
     print(f"Batch size: {config.training.batch_size}")
@@ -110,7 +110,7 @@ def train_model(
     best_val_loss = min(history.history['val_loss'])
 
     print("\n" + "=" * 70)
-    print("✅ TRAINING HOÀN THÀNH")
+    print("TRAINING HOÀN THÀNH")
     print("=" * 70)
     print(f"Best epoch: {best_epoch}/{config.training.epochs}")
     print(f"Best val_loss: {best_val_loss:.6f}")
@@ -138,7 +138,7 @@ def load_checkpoint(checkpoint_path: str) -> keras.Model:
         Model đã load
     """
     model = keras.models.load_model(checkpoint_path)
-    print(f"✅ Đã load model từ: {checkpoint_path}")
+    print(f"Đã load model từ: {checkpoint_path}")
     return model
 
 
@@ -174,9 +174,9 @@ def clean_checkpoints(
         deleted_count += 1
 
     if deleted_count > 0:
-        print(f"🗑️  Đã xóa {deleted_count} checkpoint")
+        print(f"Đã xóa {deleted_count} checkpoint")
     else:
-        print("✅ Không có checkpoint nào để xóa")
+        print("Không có checkpoint nào để xóa")
 
     return deleted_count
 

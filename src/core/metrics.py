@@ -1,5 +1,5 @@
 """
-📊 METRICS MODULE - TÍNH TOÁN METRICS
+METRICS MODULE - TÍNH TOÁN METRICS
 ----------------------------------------
 
 Giải thích bằng ví dụ đời sống:
@@ -69,7 +69,7 @@ def evaluate_model(
     mape = np.mean(np.abs((y_true - y_pred) / (y_true + 1e-8))) * 100
 
     print("\n" + "=" * 60)
-    print("📊 KẾT QUẢ ĐÁNH GIÁ TRÊN TEST SET")
+    print("KẾT QUẢ ĐÁNH GIÁ TRÊN TEST SET")
     print("=" * 60)
     print(f"MAE:  ${mae:.2f}  (Sai số trung bình tuyệt đối)")
     print(f"RMSE: ${rmse:.2f}  (Căn bậc 2 sai số bình phương)")
@@ -158,7 +158,7 @@ def calculate_direction_accuracy(
     # Tính độ chính xác
     accuracy = np.mean(true_direction == pred_direction)
 
-    print(f"📈 Độ chính xác xu hướng: {accuracy*100:.2f}%")
+    print(f"Độ chính xác xu hướng: {accuracy*100:.2f}%")
 
     return accuracy
 

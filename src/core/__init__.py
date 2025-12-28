@@ -1,5 +1,5 @@
 """
-🎯 CORE BUSINESS LOGIC
+CORE BUSINESS LOGIC
 -----------------------
 
 Module này chứa logic chính của project:

@@ -1,5 +1,5 @@
 """
-🖥️ CLI MODULE - COMMAND LINE INTERFACE
+CLI MODULE - COMMAND LINE INTERFACE
 -----------------------------------------
 
 Giải thích bằng ví dụ đời sống:
