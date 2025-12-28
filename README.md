@@ -49,11 +49,13 @@ deep_learning/
 
 | Tài liệu | Nội dung | Khi nào đọc? |
 |----------|---------|--------------|
-| **[START_HERE.md](START_HERE.md)** | Hướng dẫn bắt đầu | **BÂY GIỜ - BƯỚC 1!** |
-| [docs/SURVIVAL_GUIDE.md](docs/SURVIVAL_GUIDE.md) | Hướng dẫn sống còn | Khi gặp vấn đề |
-| [docs/ANALOGIES.md](docs/ANALOGIES.md) | Giải thích bằng ví dụ đời sống | Khi không hiểu khái niệm |
-| [docs/FLOW_DIAGRAM.md](docs/FLOW_DIAGRAM.md) | Sơ đồ flow của chương trình | Khi muốn hiểu quy trình |
-| [docs/HYPERPARAMETER_TUNING.md](docs/HYPERPARAMETER_TUNING.md) | Danh sách preset và tuning | Khi muốn tìm preset phù hợp |
+| **[START_HERE.md](START_HERE.md)** | Onboarding (từng bước) | **Bước 1** |
+| **[docs/README.md](docs/README.md)** | Index docs (đọc gì ở đâu) | Khi bị lạc / muốn overview |
+| [docs/WORKFLOW.md](docs/WORKFLOW.md) | Workflow 1 trang (run → xem kết quả → so sánh) | Khi muốn làm nhanh, ít rối |
+| [docs/CONCEPTS.md](docs/CONCEPTS.md) | Khái niệm (window, scaling, metrics, LSTM/BiLSTM) | Khi cần hiểu “tại sao” |
+| [docs/SURVIVAL_GUIDE.md](docs/SURVIVAL_GUIDE.md) | Troubleshooting / runbook | Khi gặp lỗi |
+| [docs/HYPERPARAMETER_TUNING.md](docs/HYPERPARAMETER_TUNING.md) | Presets & tuning | Khi cần chọn preset/tuning |
+| [docs/FLOW_DIAGRAM.md](docs/FLOW_DIAGRAM.md) | Sơ đồ flow chương trình | Khi muốn hiểu pipeline |
 
 ---
 
@@ -108,39 +110,9 @@ Mở file `notebooks/run_complete.ipynb` và chạy từng cell theo thứ tự.
 
 Xem hướng dẫn 1 trang: `docs/WORKFLOW.md`
 
-## 📦 Danh Sách Presets (Tập Trung 15m)
+## 📦 Presets / tuning
 
-| Preset | Limit | Window | Epochs | Mục đích |
-|--------|-------|--------|--------|----------|
-| **Scalping** (Siêu ngắn hạn) |
-| `scalping-ultra-fast` | 10K | 24 (6h) | 5 | Scalping cực nhanh |
-| `scalping-fast` | 20K | 48 (12h) | 10 | Scalping nhanh |
-| **Intraday** (Ngắn hạn) |
-| `intraday-light` | 30K | 96 (1 ngày) | 15 | Intraday nhẹ |
-| `intraday-balanced` | 50K | 144 (1.5 ngày) | 25 | Intraday cân bằng |
-| **Swing** (Trung hạn) |
-| `swing-fast` | 70K | 240 (2.5 ngày) | 30 | Swing nhanh |
-| `swing-balanced` | 100K | 384 (4 ngày) | 50 | Swing cân bằng |
-| **Long-term** (Dài hạn) |
-| `long-term` | 150K | 576 (6 ngày) | 80 | Dự đoán dài hạn |
-| **Production** (Chất lượng cao) |
-| `production` | 200K | 768 (8 ngày) | 100 | Production tốt nhất |
-| **30k Dataset** (15m - fixed dataset 30k để so sánh window) |
-| `30k-w24` | 30K | 24 (6h) | 15 | Ngắn hạn cực nhanh |
-| `30k-w48` | 30K | 48 (12h) | 15 | Ngắn hạn nhanh |
-| `30k-w72` | 30K | 72 (18h) | 20 | Ngắn hạn |
-| `30k-w96` | 30K | 96 (1 ngày) | 20 | Ngắn hạn cân bằng |
-| `30k-w144` | 30K | 144 (1.5 ngày) | 25 | Trung hạn ngắn |
-| `30k-w192` | 30K | 192 (2 ngày) | 25 | Trung hạn |
-| `30k-w240` | 30K | 240 (2.5 ngày) | 30 | Trung hạn cân bằng |
-| `30k-w336` | 30K | 336 (3.5 ngày) | 30 | Trung hạn dài |
-| `30k-w480` | 30K | 480 (5 ngày) | 40 | Dài hạn ngắn |
-| `30k-w672` | 30K | 672 (7 ngày) | 40 | Dài hạn |
-| **Legacy** (Other timeframes) |
-| `default` | 50K | 240 (2.5 ngày) | 30 | Default (15m) |
-| `fast` | 20K | 48 (12h) | 10 | Test nhanh (15m) |
-| `1h-light` | 10K | 48 (2 ngày) | 15 | Test (1h) |
-| `4h-balanced` | 2K | 24 (4 ngày) | 30 | Test (4h) |
+Danh sách presets và cách tuning được gom về 1 chỗ (tránh lặp): `docs/HYPERPARAMETER_TUNING.md`
 
 ---
 
@@ -202,7 +174,7 @@ Mỗi lần chạy tạo folder chứa:
    1. Đọc START_HERE.md
    2. Chọn preset phù hợp
    3. Chạy CLI hoặc Notebook
-   4. Đọc docs/ANALOGIES.md nếu không hiểu khái niệm
+   4. Đọc docs/CONCEPTS.md nếu không hiểu khái niệm
 
 ❌ SAI:
    - Nhảy lung tung → lạc lối nhanh!
@@ -243,7 +215,7 @@ Tất cả file code có analogies (ví dụ đời sống) để dễ hiểu:
 → Đọc lại `START_HERE.md`
 
 ### Không hiểu khái niệm?
-→ Đọc `docs/ANALOGIES.md`
+→ Đọc `docs/CONCEPTS.md`
 
 ### Không biết chọn preset nào?
 → Đọc `docs/HYPERPARAMETER_TUNING.md`

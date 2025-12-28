@@ -145,9 +145,9 @@ y_test = data_dict['y_test']
   - Giải quyết vanishing gradient problem của RNN thường
 
 - **BiLSTM (Bidirectional LSTM)**:
-  - LSTM nhìn cả quá khứ VÀ tương lai
+  - Chạy 2 chiều trên *cùng một input window* (forward + backward) để tận dụng ngữ cảnh tốt hơn
   - 2 LSTM: 1 đọc từ trái → phải, 1 đọc từ phải → trái
-  - Tại sao nhìn tương lai được? Vì khi train, ta có toàn bộ data!
+  - Lưu ý: Không “nhìn tương lai” ngoài điểm dự đoán; chỉ là xử lý hai chiều bên trong window đầu vào
 
 - **Dropout**:
   - Bỏ ngẫu nhiên một số neurons trong quá trình training
@@ -412,6 +412,6 @@ uv run python -m cli.main --data-path data/btc_1d_data_2018_to_2025.csv
 
 Nếu bạn theo dõi từng bước và gặp vấn đề:
 1. Đọc lại phần tương ứng trong file này
-2. Đọc ANALOGIES.md để hiểu khái niệm
+2. Đọc `docs/CONCEPTS.md` để hiểu khái niệm
 3. Xem error message và tìm trong Troubleshooting
 

@@ -71,16 +71,16 @@ Tìm ra cấu hình tốt nhất bằng cách thử nghiệm các tổ hợp tha
 **Cách dùng presets:**
 ```bash
 # Scalping cực nhanh (6h)
-python -m cli.main --preset scalping-ultra-fast
+uv run python -m cli.main --preset scalping-ultra-fast
 
 # Intraday cân bằng (1.5 ngày) - Khuyến nghị
-python -m cli.main --preset intraday-balanced
+uv run python -m cli.main --preset intraday-balanced
 
 # Production chất lượng cao (8 ngày)
-python -m cli.main --preset production
+uv run python -m cli.main --preset production
 
 # Test với 1h timeframe
-python -m cli.main --preset 1h-light
+uv run python -m cli.main --preset 1h-light
 ```
 
 ---
@@ -166,207 +166,19 @@ Dựa vào kinh nghiệm và kết quả trước đó để điều chỉnh t�
 
 ---
 
-## 📝 Danh Sách Lệnh
-
-### 🚀 Phase 1: Baseline - Thiết Lập Điểm Chuẩn
-
-Chạy các lệnh này để có baseline để so sánh:
+## 📝 Ví dụ lệnh (đủ dùng, tránh dài dòng)
 
 ```bash
-# Baseline 1: Config mặc định
-uv run python -m cli.main
-
-# Baseline 2: Preset fast (nhanh, test)
-uv run python -m cli.main --preset fast
-
-# Baseline 3: Preset intraday-balanced (khuyến nghị)
+# Baseline
 uv run python -m cli.main --preset intraday-balanced
-```
 
----
+# Cố định data rồi sweep window
+uv run python -m cli.main --limit 30000 --window 72 --epochs 20
+uv run python -m cli.main --limit 30000 --window 96 --epochs 20
+uv run python -m cli.main --limit 30000 --window 144 --epochs 25
 
-### 🔍 Phase 2: Tuning Timeframe
-
-So sánh giữa timeframe 1d và 4h (lưu ý: project mặc định/preset default tập trung 15m):
-
-```bash
-# Timeframe 1d
-uv run python -m cli.main --timeframe 1d --window 60 --epochs 20
-
-# Timeframe 4h (nhiều dữ liệu hơn)
-uv run python -m cli.main --timeframe 4h --window 60 --epochs 20
-```
-
----
-
-### 📏 Phase 3: Tuning Window Size
-
-Thử các window size khác nhau (gợi ý window “đúng ngữ cảnh” cho 15m):
-
-```bash
-# Window nhỏ - Scalping (15m)
-uv run python -m cli.main --window 24 --epochs 10
-uv run python -m cli.main --window 48 --epochs 10
-
-# Window trung bình - Intraday (15m)
-uv run python -m cli.main --window 96 --epochs 20
-uv run python -m cli.main --window 144 --epochs 25
-
-# Window lớn - Swing/Longer (15m)
-uv run python -m cli.main --window 240 --epochs 30
-uv run python -m cli.main --window 384 --epochs 50
-```
-
----
-
-### 🧠 Phase 4: Tuning Model Architecture (LSTM Units)
-
-Thử các kiến trúc model khác nhau:
-
-```bash
-# Model nhỏ - Nhanh, ít overfitting
-uv run python -m cli.main --lstm-units 32 16 --epochs 20
-uv run python -m cli.main --lstm-units 48 24 --epochs 20
-
-# Model trung bình - Cân bằng (mặc định)
-uv run python -m cli.main --lstm-units 64 32 --epochs 20
-uv run python -m cli.main --lstm-units 64 32 16 --epochs 20
-
-# Model lớn - Mạnh hơn
-uv run python -m cli.main --lstm-units 128 64 --epochs 20
-uv run python -m cli.main --lstm-units 128 64 32 --epochs 20
-uv run python -m cli.main --lstm-units 256 128 64 --epochs 30
-```
-
----
-
-### 🎚️ Phase 5: Tuning Dropout Rate
-
-Điều chỉnh dropout để giảm overfitting:
-
-```bash
-# Dropout thấp - Khi model chưa overfit
-uv run python -m cli.main --dropout 0.1 --epochs 20
-uv run python -m cli.main --dropout 0.15 --epochs 20
-
-# Dropout trung bình - Mặc định
-uv run python -m cli.main --dropout 0.2 --epochs 20
-
-# Dropout cao - Khi model bị overfit
-uv run python -m cli.main --dropout 0.3 --epochs 20
-uv run python -m cli.main --dropout 0.4 --epochs 20
-uv run python -m cli.main --dropout 0.5 --epochs 20
-```
-
----
-
-### ⏱️ Phase 6: Tuning Training Parameters
-
-Điều chỉnh epochs và batch size:
-
-```bash
-# Epochs ít - Nhanh
-uv run python -m cli.main --epochs 10
-uv run python -m cli.main --epochs 15
-
-# Epochs trung bình - Mặc định
-uv run python -m cli.main --epochs 20
-uv run python -m cli.main --epochs 30
-
-# Epochs nhiều - Chất lượng cao
-uv run python -m cli.main --epochs 50
-uv run python -m cli.main --epochs 100
-
-# Batch size nhỏ
-uv run python -m cli.main --batch-size 16 --epochs 20
-uv run python -m cli.main --batch-size 32 --epochs 20
-
-# Batch size lớn
-uv run python -m cli.main --batch-size 64 --epochs 20
-uv run python -m cli.main --batch-size 128 --epochs 20
-```
-
----
-
-### 📊 Phase 7: Tuning Data Amount
-
-Thử với lượng dữ liệu khác nhau (15m):
-
-```bash
-# Ít dữ liệu - Nhanh, test
-uv run python -m cli.main --limit 10000 --epochs 10
-uv run python -m cli.main --limit 20000 --epochs 10
-
-# Trung bình - Khuyến nghị
-uv run python -m cli.main --limit 30000 --epochs 20
-uv run python -m cli.main --limit 50000 --epochs 25
-
-# Nhiều dữ liệu - Chất lượng cao (chậm)
-uv run python -m cli.main --limit 100000 --epochs 50
-uv run python -m cli.main --limit 200000 --epochs 100
-```
-
----
-
-### 🎯 Phase 8: Tổ Hợp Tốt Nhất (Best Combinations)
-
-Dựa trên kết quả từ các phase trước, thử các tổ hợp tốt nhất:
-
-```bash
-# Tổ hợp 1: Timeframe 1d, Window lớn, Model lớn
-uv run python -m cli.main \
-    --timeframe 1d \
-    --window 100 \
-    --lstm-units 128 64 32 \
-    --dropout 0.2 \
-    --epochs 50 \
-    --limit 3000
-
-# Tổ hợp 2: Timeframe 4h, Window trung bình, Model trung bình
-uv run python -m cli.main \
-    --timeframe 4h \
-    --window 60 \
-    --lstm-units 64 32 \
-    --dropout 0.2 \
-    --epochs 30 \
-    --limit 2000
-
-# Tổ hợp 3: Timeframe 1d, Window lớn, Model lớn, Dropout cao
-uv run python -m cli.main \
-    --timeframe 1d \
-    --window 90 \
-    --lstm-units 128 64 \
-    --dropout 0.3 \
-    --epochs 40 \
-    --limit 2500
-
-# Tổ hợp 4: Timeframe 4h, Window nhỏ, Model nhỏ (nhanh)
-uv run python -m cli.main \
-    --timeframe 4h \
-    --window 40 \
-    --lstm-units 48 24 \
-    --dropout 0.2 \
-    --epochs 20 \
-    --limit 1500
-```
-
----
-
-### 🔄 Phase 9: Advanced Tuning
-
-Các thử nghiệm nâng cao:
-
-```bash
-# Thử với nhiều features (nếu có)
-uv run python -m cli.main --features close volume --window 60
-
-# Refresh cache để đảm bảo dữ liệu mới nhất
-uv run python -m cli.main --refresh-cache --window 60 --epochs 20
-
-# Seed khác nhau để kiểm tra tính ổn định
-uv run python -m cli.main --seed 42 --window 60 --epochs 20
-uv run python -m cli.main --seed 123 --window 60 --epochs 20
-uv run python -m cli.main --seed 999 --window 60 --epochs 20
+# Khi nghi overfitting: tăng dropout / giảm model
+uv run python -m cli.main --preset intraday-balanced --dropout 0.3
 ```
 
 ---
