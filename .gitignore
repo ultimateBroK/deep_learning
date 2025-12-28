@@ -17,3 +17,5 @@ reports/main/
 reports/notebook/
 *.keras
 *.h5
+
+submission/
