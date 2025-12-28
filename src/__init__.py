@@ -40,6 +40,17 @@ from .config import (
     get_long_term_config,
     # Production preset (15m)
     get_production_config,
+    # 30k dataset presets (15m - Window size từ ngắn đến dài hạn)
+    get_30k_w24_config,
+    get_30k_w48_config,
+    get_30k_w72_config,
+    get_30k_w96_config,
+    get_30k_w144_config,
+    get_30k_w192_config,
+    get_30k_w240_config,
+    get_30k_w336_config,
+    get_30k_w480_config,
+    get_30k_w672_config,
     # Legacy presets (other timeframes)
     get_default_config,
     get_fast_config,
@@ -71,6 +82,17 @@ __all__ = [
     "get_long_term_config",
     # Production preset (15m)
     "get_production_config",
+    # 30k dataset presets (15m - Window size từ ngắn đến dài hạn)
+    "get_30k_w24_config",
+    "get_30k_w48_config",
+    "get_30k_w72_config",
+    "get_30k_w96_config",
+    "get_30k_w144_config",
+    "get_30k_w192_config",
+    "get_30k_w240_config",
+    "get_30k_w336_config",
+    "get_30k_w480_config",
+    "get_30k_w672_config",
     # Legacy presets (other timeframes)
     "get_default_config",
     "get_fast_config",

@@ -72,8 +72,11 @@ def create_results_folder(
     - Không bị lẫn với kết quả lần trước
     - Tên folder chứa thông tin quan trọng để dễ phân biệt
 
-    Format tên: BiLSTM_{timeframe}_w{window}_e{epochs}_u{lstm_units}_d{dropout}_b{batch}_{scaler}_{timestamp}
-    Ví dụ: BiLSTM_1d_w60_e20_u64-32_d02_b32_mm_20251227_133014
+    Format tên (đơn giản): BiLSTM_{timeframe}_w{window}_l{limit}_{timestamp}
+    Ví dụ: BiLSTM_15m_w96_l30k_20251227_133014
+    
+    Format đầy đủ (nếu có thêm tham số): BiLSTM_{timeframe}_w{window}_l{limit}_e{epochs}_u{lstm_units}_d{dropout}_b{batch}_{scaler}_{timestamp}
+    Ví dụ: BiLSTM_15m_w96_l30k_e20_u64-32_d20_b32_mm_20251227_133014
 
     Args:
         base_path: Đường dẫn cơ sở
@@ -81,11 +84,14 @@ def create_results_folder(
         config: Dict chứa config với các tham số:
             - timeframe: str (bắt buộc)
             - window_size: int (bắt buộc)
-            - epochs: int (tùy chọn)
-            - lstm_units: List[int] (tùy chọn)
-            - dropout_rate: float (tùy chọn)
-            - batch_size: int (tùy chọn)
-            - scaler_type: str (tùy chọn)
+            - limit: int (tùy chọn) - số dòng dữ liệu (khuyến nghị dùng)
+            - epochs: int (tùy chọn) - chỉ thêm nếu cần phân biệt
+            - lstm_units: List[int] (tùy chọn) - chỉ thêm nếu cần phân biệt
+            - dropout_rate: float (tùy chọn) - chỉ thêm nếu cần phân biệt
+            - batch_size: int (tùy chọn) - chỉ thêm nếu cần phân biệt
+            - scaler_type: str (tùy chọn) - chỉ thêm nếu cần phân biệt
+    
+    Note: Format mặc định chỉ dùng timeframe, window_size, limit (đồng bộ với notebook)
 
     Returns:
         Đường dẫn đến folder kết quả
@@ -106,6 +112,16 @@ def create_results_folder(
         
         # Bắt đầu với phần cơ bản
         parts = [f"BiLSTM_{timeframe}", f"w{window_size}"]
+        
+        # Thêm limit nếu có (rút gọn: 30000 -> l30k, 50000 -> l50k, 100000 -> l100k)
+        if 'limit' in config and config['limit']:
+            limit = config['limit']
+            if limit >= 1000:
+                # Rút gọn: 30000 -> l30k, 50000 -> l50k, 100000 -> l100k
+                limit_k = limit // 1000
+                parts.append(f"l{limit_k}k")
+            else:
+                parts.append(f"l{limit}")
         
         # Thêm epochs nếu có
         if 'epochs' in config and config['epochs']:

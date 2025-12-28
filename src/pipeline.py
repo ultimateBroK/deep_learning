@@ -189,15 +189,11 @@ def run_pipeline(config: Optional[Config] = None, run_type: str = "main") -> Dic
     print("💾 LƯU KẾT QUẢ")
     print("=" * 70 + "\n")
 
-    # Tạo config dict để đặt tên folder với nhiều tham số quan trọng
+    # Tạo config dict để đặt tên folder (đồng bộ với notebook: chỉ dùng 3 tham số cơ bản)
     folder_config = {
         'timeframe': config.data.timeframe,
         'window_size': config.preprocessing.window_size,
-        'epochs': config.training.epochs,
-        'lstm_units': config.model.lstm_units,
-        'dropout_rate': config.model.dropout_rate,
-        'batch_size': config.training.batch_size,
-        'scaler_type': config.preprocessing.scaler_type,
+        'limit': config.data.limit,
     }
     results_folder = create_results_folder(run_type=run_type, config=folder_config)
     print(f"\n📁 Folder kết quả: {results_folder}\n")

@@ -389,6 +389,140 @@ def get_production_config() -> Config:
     return config
 
 
+# ==================== PRESETS 30K DATASET (15m - Window size từ ngắn đến dài hạn) ====================
+# Tất cả preset này dùng dataset 30000 với intra_op_threads=12
+# Window size trải dài từ ngắn hạn đến dài hạn để test
+
+def get_30k_w24_config() -> Config:
+    """30k dataset - Window 24 (6h) - Ngắn hạn cực nhanh"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 24  # 6 tiếng 15m
+    config.training.epochs = 15
+    config.training.early_stopping_patience = 5
+    config.model.lstm_units = [32, 16]
+    config.model.dense_units = [16]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w48_config() -> Config:
+    """30k dataset - Window 48 (12h) - Ngắn hạn nhanh"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 48  # 12 tiếng 15m
+    config.training.epochs = 15
+    config.training.early_stopping_patience = 5
+    config.model.lstm_units = [32, 16]
+    config.model.dense_units = [16]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w72_config() -> Config:
+    """30k dataset - Window 72 (18h) - Ngắn hạn"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 72  # 18 tiếng 15m
+    config.training.epochs = 20
+    config.training.early_stopping_patience = 6
+    config.model.lstm_units = [32, 16]
+    config.model.dense_units = [16]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w96_config() -> Config:
+    """30k dataset - Window 96 (1 ngày) - Ngắn hạn cân bằng"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 96  # 1 ngày 15m
+    config.training.epochs = 20
+    config.training.early_stopping_patience = 6
+    config.model.lstm_units = [64, 32]
+    config.model.dense_units = [32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w144_config() -> Config:
+    """30k dataset - Window 144 (1.5 ngày) - Trung hạn ngắn"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 144  # 1.5 ngày 15m
+    config.training.epochs = 25
+    config.training.early_stopping_patience = 8
+    config.model.lstm_units = [64, 32]
+    config.model.dense_units = [32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w192_config() -> Config:
+    """30k dataset - Window 192 (2 ngày) - Trung hạn"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 192  # 2 ngày 15m
+    config.training.epochs = 25
+    config.training.early_stopping_patience = 8
+    config.model.lstm_units = [64, 32]
+    config.model.dense_units = [32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w240_config() -> Config:
+    """30k dataset - Window 240 (2.5 ngày) - Trung hạn cân bằng"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 240  # 2.5 ngày 15m
+    config.training.epochs = 30
+    config.training.early_stopping_patience = 10
+    config.model.lstm_units = [64, 32]
+    config.model.dense_units = [32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w336_config() -> Config:
+    """30k dataset - Window 336 (3.5 ngày) - Trung hạn dài"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 336  # 3.5 ngày 15m
+    config.training.epochs = 30
+    config.training.early_stopping_patience = 10
+    config.model.lstm_units = [128, 64, 32]
+    config.model.dense_units = [64, 32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w480_config() -> Config:
+    """30k dataset - Window 480 (5 ngày) - Dài hạn ngắn"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 480  # 5 ngày 15m
+    config.training.epochs = 40
+    config.training.early_stopping_patience = 12
+    config.model.lstm_units = [128, 64, 32]
+    config.model.dense_units = [64, 32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
+def get_30k_w672_config() -> Config:
+    """30k dataset - Window 672 (7 ngày) - Dài hạn"""
+    config = Config()
+    config.data.limit = 30000
+    config.preprocessing.window_size = 672  # 7 ngày 15m
+    config.training.epochs = 40
+    config.training.early_stopping_patience = 12
+    config.model.lstm_units = [128, 64, 32]
+    config.model.dense_units = [64, 32]
+    config.runtime.intra_op_threads = 12
+    return config
+
+
 # ==================== LEGACY PRESETS (Cho các timeframe khác) ====================
 def get_default_config() -> Config:
     """Config mặc định - dành cho 15m timeframe (default)"""
