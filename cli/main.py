@@ -48,7 +48,7 @@ try:
 except ImportError:
     pass  # TensorFlow chưa được cài đặt
 
-from src import Config, run_pipeline, get_default_config, get_fast_config, get_1h_light_config, get_4h_balanced_config, get_scalping_ultra_fast_config, get_scalping_fast_config, get_intraday_light_config, get_intraday_balanced_config, get_swing_fast_config, get_swing_balanced_config, get_long_term_config, get_production_config   # noqa: E402
+from src import Config, run_pipeline, get_default_config, get_fast_config, get_1h_light_config, get_4h_balanced_config, get_scalping_ultra_fast_config, get_scalping_fast_config, get_intraday_light_config, get_intraday_balanced_config, get_swing_fast_config, get_swing_balanced_config, get_long_term_config, get_production_config, get_30k_w24_config, get_30k_w48_config, get_30k_w72_config, get_30k_w96_config, get_30k_w144_config, get_30k_w192_config, get_30k_w240_config, get_30k_w336_config, get_30k_w480_config, get_30k_w672_config   # noqa: E402
 from src.core.data import _infer_timeframe_from_filename   # noqa: E402
 
 
@@ -83,13 +83,13 @@ Ví dụ:
         type=str,
         default=None,
         choices=['1d', '4h', '1h', '15m'],
-        help='Timeframe (mặc định: 1d)'
+        help='Timeframe (mặc định theo preset/config; preset default = 15m)'
     )
     data_group.add_argument(
         '--limit',
         type=int,
         default=None,
-        help='Lấy N dòng cuối trong file CSV (mặc định: 1500, <=0 = lấy tất cả)'
+        help='Lấy N dòng cuối trong file CSV (mặc định theo preset/config; <=0 = lấy tất cả)'
     )
     data_group.add_argument(
         '--refresh-cache',
@@ -111,7 +111,7 @@ Ví dụ:
         '--window',
         type=int,
         default=None,
-        help='Số nến nhìn lại (mặc định: 60)'
+        help='Số nến nhìn lại (mặc định theo preset/config; preset default = 240)'
     )
     prep_group.add_argument(
         '--scaler-type',
@@ -145,7 +145,7 @@ Ví dụ:
         '--epochs',
         type=int,
         default=None,
-        help='Số epochs (mặc định: 20)'
+        help='Số epochs (mặc định theo preset/config; preset default = 30)'
     )
     train_group.add_argument(
         '--batch-size',
@@ -163,7 +163,7 @@ Ví dụ:
         '--early-stopping-patience',
         type=int,
         default=None,
-        help='Số epochs chờ trước khi dừng (mặc định: 5)'
+        help='Số epochs chờ trước khi dừng (mặc định theo preset/config; preset default = 10)'
     )
 
     # ==================== RUNTIME ARGS ====================
@@ -173,19 +173,19 @@ Ví dụ:
         '--intra-threads',
         type=int,
         default=None,
-        help='CPU threads cho operations trong cùng op (mặc định: 12)'
+        help='CPU threads cho operations trong cùng op (mặc định theo preset/config; default = 12)'
     )
     runtime_group.add_argument(
         '--inter-threads',
         type=int,
         default=None,
-        help='CPU threads cho operations khác nhau (mặc định: 2)'
+        help='CPU threads cho operations khác nhau (mặc định theo preset/config; default = 2)'
     )
     runtime_group.add_argument(
         '--seed',
         type=int,
         default=None,
-        help='Cố định ngẫu nhiên để tái lập kết quả (mặc định: 42, <0 = không set)'
+        help='Cố định ngẫu nhiên để tái lập kết quả (mặc định theo preset/config; default = 42, <0 = không set)'
     )
 
     # ==================== PRESET ====================
@@ -194,7 +194,7 @@ Ví dụ:
     preset_group.add_argument(
         '--preset',
         type=str,
-        choices=['default', 'fast', '1h-light', '4h-balanced', 'scalping-ultra-fast', 'scalping-fast', 'intraday-light', 'intraday-balanced', 'swing-fast', 'swing-balanced', 'long-term', 'production'],
+        choices=['default', 'fast', '1h-light', '4h-balanced', 'scalping-ultra-fast', 'scalping-fast', 'intraday-light', 'intraday-balanced', 'swing-fast', 'swing-balanced', 'long-term', 'production', '30k-w24', '30k-w48', '30k-w72', '30k-w96', '30k-w144', '30k-w192', '30k-w240', '30k-w336', '30k-w480', '30k-w672'],
         default='default',
         help='Preset config (mặc định: default)'
     )
@@ -225,6 +225,17 @@ def main():
         'swing-balanced': get_swing_balanced_config,
         'long-term': get_long_term_config,
         'production': get_production_config,
+        # 30k dataset presets (15m - fixed limit=30000)
+        '30k-w24': get_30k_w24_config,
+        '30k-w48': get_30k_w48_config,
+        '30k-w72': get_30k_w72_config,
+        '30k-w96': get_30k_w96_config,
+        '30k-w144': get_30k_w144_config,
+        '30k-w192': get_30k_w192_config,
+        '30k-w240': get_30k_w240_config,
+        '30k-w336': get_30k_w336_config,
+        '30k-w480': get_30k_w480_config,
+        '30k-w672': get_30k_w672_config,
     }
 
     config = preset_map[args.preset]()

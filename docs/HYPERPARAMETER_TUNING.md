@@ -56,6 +56,17 @@ Tìm ra cấu hình tốt nhất bằng cách thử nghiệm các tổ hợp tha
 | `fast` | 20K | 48 (12h) | 10 | Test nhanh (15m) | Test nhanh |
 | `1h-light` | 10K | 48 (2 ngày) | 15 | Test (1h) | Test 1h |
 | `4h-balanced` | 2K | 24 (4 ngày) | 30 | Test (4h) | Test 4h |
+| **30k Dataset** (15m - fixed dataset 30k để so sánh window) |
+| `30k-w24` | 30K | 24 (6h) | 15 | Ngắn hạn cực nhanh | So sánh window |
+| `30k-w48` | 30K | 48 (12h) | 15 | Ngắn hạn nhanh | So sánh window |
+| `30k-w72` | 30K | 72 (18h) | 20 | Ngắn hạn | So sánh window |
+| `30k-w96` | 30K | 96 (1 ngày) | 20 | Ngắn hạn cân bằng | So sánh window |
+| `30k-w144` | 30K | 144 (1.5 ngày) | 25 | Trung hạn ngắn | So sánh window |
+| `30k-w192` | 30K | 192 (2 ngày) | 25 | Trung hạn | So sánh window |
+| `30k-w240` | 30K | 240 (2.5 ngày) | 30 | Trung hạn cân bằng | So sánh window |
+| `30k-w336` | 30K | 336 (3.5 ngày) | 30 | Trung hạn dài | So sánh window |
+| `30k-w480` | 30K | 480 (5 ngày) | 40 | Dài hạn ngắn | So sánh window |
+| `30k-w672` | 30K | 672 (7 ngày) | 40 | Dài hạn | So sánh window |
 
 **Cách dùng presets:**
 ```bash
@@ -130,8 +141,6 @@ python -m cli.main --preset 1h-light
   - Ít (10K-20K): Nhanh, phù hợp test/scalping
   - Trung bình (50K-70K): Khuyến nghị cho intraday
   - Nhiều (100K-200K): Cho kết quả tốt nhất nhưng lâu hơn (swing/long-term)
-  - Trung bình (1500-2000): Cân bằng tốt
-  - Nhiều (3000+): Kết quả tốt hơn nhưng chậm hơn
 
 ---
 
@@ -170,18 +179,18 @@ uv run python -m cli.main
 # Baseline 2: Preset fast (nhanh, test)
 uv run python -m cli.main --preset fast
 
-# Baseline 3: Preset high-quality (chất lượng cao)
-uv run python -m cli.main --preset high-quality
+# Baseline 3: Preset intraday-balanced (khuyến nghị)
+uv run python -m cli.main --preset intraday-balanced
 ```
 
 ---
 
 ### 🔍 Phase 2: Tuning Timeframe
 
-So sánh giữa timeframe 1d và 4h:
+So sánh giữa timeframe 1d và 4h (lưu ý: project mặc định/preset default tập trung 15m):
 
 ```bash
-# Timeframe 1d (mặc định)
+# Timeframe 1d
 uv run python -m cli.main --timeframe 1d --window 60 --epochs 20
 
 # Timeframe 4h (nhiều dữ liệu hơn)
@@ -192,21 +201,20 @@ uv run python -m cli.main --timeframe 4h --window 60 --epochs 20
 
 ### 📏 Phase 3: Tuning Window Size
 
-Thử các window size khác nhau:
+Thử các window size khác nhau (gợi ý window “đúng ngữ cảnh” cho 15m):
 
 ```bash
-# Window nhỏ - Phản ứng nhanh
-uv run python -m cli.main --window 30 --epochs 20
-uv run python -m cli.main --window 40 --epochs 20
+# Window nhỏ - Scalping (15m)
+uv run python -m cli.main --window 24 --epochs 10
+uv run python -m cli.main --window 48 --epochs 10
 
-# Window trung bình - Cân bằng (mặc định)
-uv run python -m cli.main --window 60 --epochs 20
-uv run python -m cli.main --window 80 --epochs 20
+# Window trung bình - Intraday (15m)
+uv run python -m cli.main --window 96 --epochs 20
+uv run python -m cli.main --window 144 --epochs 25
 
-# Window lớn - Xu hướng dài hạn
-uv run python -m cli.main --window 90 --epochs 20
-uv run python -m cli.main --window 100 --epochs 20
-uv run python -m cli.main --window 120 --epochs 20
+# Window lớn - Swing/Longer (15m)
+uv run python -m cli.main --window 240 --epochs 30
+uv run python -m cli.main --window 384 --epochs 50
 ```
 
 ---
@@ -282,20 +290,20 @@ uv run python -m cli.main --batch-size 128 --epochs 20
 
 ### 📊 Phase 7: Tuning Data Amount
 
-Thử với lượng dữ liệu khác nhau:
+Thử với lượng dữ liệu khác nhau (15m):
 
 ```bash
 # Ít dữ liệu - Nhanh, test
-uv run python -m cli.main --limit 500 --epochs 10
-uv run python -m cli.main --limit 1000 --epochs 15
+uv run python -m cli.main --limit 10000 --epochs 10
+uv run python -m cli.main --limit 20000 --epochs 10
 
-# Trung bình - Mặc định
-uv run python -m cli.main --limit 1500 --epochs 20
-uv run python -m cli.main --limit 2000 --epochs 20
+# Trung bình - Khuyến nghị
+uv run python -m cli.main --limit 30000 --epochs 20
+uv run python -m cli.main --limit 50000 --epochs 25
 
-# Nhiều dữ liệu - Chất lượng cao
-uv run python -m cli.main --limit 3000 --epochs 30
-uv run python -m cli.main --limit 5000 --epochs 50
+# Nhiều dữ liệu - Chất lượng cao (chậm)
+uv run python -m cli.main --limit 100000 --epochs 50
+uv run python -m cli.main --limit 200000 --epochs 100
 ```
 
 ---

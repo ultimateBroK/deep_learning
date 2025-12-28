@@ -108,17 +108,17 @@ Bạn muốn dự đoán thời tiết ngày mai.
 
 ### Ví dụ đời sống: Học thi đại học
 
-**Train (80%):**
+**Train (70%):**
 - Bạn học bài ở nhà
 - Làm bài tập, đọc sách
 - Làm xong đáp án ngay → biết mình đúng/sai
 
-**Validation (10%):**
+**Validation (15%):**
 - Làm đề thử tại trường
 - Không có đáp án ngay, chờ thầy chấm
 - Điều chỉnh cách học dựa trên kết quả
 
-**Test (10%):**
+**Test (15%):**
 - Thi thật (đại học, Học viện, v.v.)
 - Chưa từng thấy đề này trước
 - Kết quả thi: Chỉ có 1 lần!

@@ -38,12 +38,12 @@ Hiểu quy trình tổng thể của chương trình qua sơ đồ chi tiết.
 │  └─────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────┐    │
 │  │ 2.2: Sliding Window                                     │    │
-│  │     • Tạo sequences (window_size=60)                    │    │
+│  │     • Tạo sequences (window_size=240 default 15m)       │    │
 │  │     • Input: 60 ngày → Output: ngày 61                  │    │
 │  └─────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────┐    │
 │  │ 2.3: Split Data                                         │    │
-│  │     • Train (80%), Val (10%), Test (10%)                │    │
+│  │     • Train (70%), Val (15%), Test (15%)                │    │
 │  │     • KHÔNG shuffle (time series!)                      │    │
 │  └─────────────────────────────────────────────────────────┘    │
 └──────────────────────────┬──────────────────────────────────────┘
@@ -86,7 +86,7 @@ Hiểu quy trình tổng thể của chương trình qua sơ đồ chi tiết.
 │  │    • EarlyStopping: Dừng nếu val_loss không giảm        │    │
 │  │    • ReduceLROnPlateau: Giảm LR nếu không cải thiện     │    │
 │  └─────────────────────────────────────────────────────────┘    │
-│  • Epochs: 20 (hoặc EarlyStopping)                              │
+│  • Epochs: 30 (hoặc EarlyStopping)                              │
 │  • Batch size: 32                                               │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
@@ -185,15 +185,15 @@ prepare_data_for_lstm()
          ▼
 ┌──────────────────┐
 │ Sliding Window   │
-│ (window_size=60) │
+│ (window_size=240) │
 └────────┬─────────┘
          │
          ▼
 ┌──────────────────┐
 │ Split Data       │
-│ 80% train        │
-│ 10% val          │
-│ 10% test         │
+│ 70% train        │
+│ 15% val          │
+│ 15% test         │
 └────────┬─────────┘
          │
          ▼
@@ -219,7 +219,7 @@ build_bilstm_model()
          ▼
 ┌──────────────────┐
 │ Input Layer      │
-│ (60, 1)          │
+│ (window_size, n_features) │
 └────────┬─────────┘
          │
          ▼

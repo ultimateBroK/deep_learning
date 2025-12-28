@@ -104,6 +104,10 @@ Mở file `notebooks/run_complete.ipynb` và chạy từng cell theo thứ tự.
 
 ---
 
+## 🧭 Workflow “không rối não”
+
+Xem hướng dẫn 1 trang: `docs/WORKFLOW.md`
+
 ## 📦 Danh Sách Presets (Tập Trung 15m)
 
 | Preset | Limit | Window | Epochs | Mục đích |
@@ -121,6 +125,17 @@ Mở file `notebooks/run_complete.ipynb` và chạy từng cell theo thứ tự.
 | `long-term` | 150K | 576 (6 ngày) | 80 | Dự đoán dài hạn |
 | **Production** (Chất lượng cao) |
 | `production` | 200K | 768 (8 ngày) | 100 | Production tốt nhất |
+| **30k Dataset** (15m - fixed dataset 30k để so sánh window) |
+| `30k-w24` | 30K | 24 (6h) | 15 | Ngắn hạn cực nhanh |
+| `30k-w48` | 30K | 48 (12h) | 15 | Ngắn hạn nhanh |
+| `30k-w72` | 30K | 72 (18h) | 20 | Ngắn hạn |
+| `30k-w96` | 30K | 96 (1 ngày) | 20 | Ngắn hạn cân bằng |
+| `30k-w144` | 30K | 144 (1.5 ngày) | 25 | Trung hạn ngắn |
+| `30k-w192` | 30K | 192 (2 ngày) | 25 | Trung hạn |
+| `30k-w240` | 30K | 240 (2.5 ngày) | 30 | Trung hạn cân bằng |
+| `30k-w336` | 30K | 336 (3.5 ngày) | 30 | Trung hạn dài |
+| `30k-w480` | 30K | 480 (5 ngày) | 40 | Dài hạn ngắn |
+| `30k-w672` | 30K | 672 (7 ngày) | 40 | Dài hạn |
 | **Legacy** (Other timeframes) |
 | `default` | 50K | 240 (2.5 ngày) | 30 | Default (15m) |
 | `fast` | 20K | 48 (12h) | 10 | Test nhanh (15m) |

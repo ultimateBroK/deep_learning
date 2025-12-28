@@ -104,9 +104,9 @@ Sample 3: Input: [20000, 25000, 30000] → Output: 35000
 ### 2.3: Split Data (Chia train/val/test)
 
 #### Giải thích
-- **Train (80%)**: Dùng để huấn luyện model
-- **Validation (10%)**: Dùng để điều chỉnh hyperparameters, dừng training sớm
-- **Test (10%)**: Dùng để đánh giá cuối cùng (chỉ dùng 1 lần!)
+- **Train (70%)**: Dùng để huấn luyện model
+- **Validation (15%)**: Dùng để điều chỉnh hyperparameters, dừng training sớm
+- **Test (15%)**: Dùng để đánh giá cuối cùng (chỉ dùng 1 lần!)
 
 #### Tại sao phải chia?
 - Nếu train và test trên cùng dữ liệu → model "vẹt", không thực chiến được

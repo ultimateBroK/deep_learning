@@ -108,8 +108,8 @@ def _normalize_binance_export_csv(df_raw: pl.DataFrame) -> pl.DataFrame:
 def fetch_binance_data(
     data_path: Optional[str] = None,
     data_dir: Optional[Path] = None,
-    timeframe: str = "1d",
-    limit: int = 1500,
+    timeframe: str = "15m",
+    limit: int = 50000,
     save_cache: bool = True,
     cache_dir: Optional[Path] = None
 ) -> pl.DataFrame:
@@ -144,7 +144,7 @@ def fetch_binance_data(
 
     # Xác định file dữ liệu
     if data_path is None:
-        tf = (timeframe or "1d").lower()
+        tf = (timeframe or "15m").lower()
         # Chọn file tương ứng với timeframe
         if tf == "15m":
             data_file = data_dir / "btc_15m_data_2018_to_2025.csv"
@@ -160,7 +160,7 @@ def fetch_binance_data(
     if not data_file.exists():
         raise FileNotFoundError(f"Không tìm thấy file data: {data_file}")
 
-    inferred_tf = _infer_timeframe_from_filename(data_file) or (timeframe or "1d")
+    inferred_tf = _infer_timeframe_from_filename(data_file) or (timeframe or "15m")
 
     # Tên file cache
     stem = data_file.stem
