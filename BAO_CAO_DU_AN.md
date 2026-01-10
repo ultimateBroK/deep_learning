@@ -1,13 +1,8 @@
 <div align="center">
 
-# BÁO CÁO DỰ ÁN: DỰ BÁO GIÁ BITCOIN (BTC/USDT) KHUNG THỜI GIAN 15 PHÚT SỬ DỤNG MÔ HÌNH BiLSTM (Long Short-Term Memory hai chiều)
+# DỰ BÁO GIÁ BITCOIN KHUNG THỜI GIAN 15 PHÚT SỬ DỤNG MÔ HÌNH BiLSTM
 
 </div>
-
-- **Sinh viên:** Nguyễn Đức Hiếu  
-- **Môn học:** Học sâu (Deep Learning)  
-- **Giảng viên:** Lê Văn Hùng  
-- **Ngày nộp:** 28/12/2025  
 
 ---
 
@@ -119,7 +114,19 @@ Giá BTC biên độ rất lớn (10,000–100,000+), nên cần *scaling* (chu�
 ### 4.1. Luồng tổng quan (*end-to-end*)
 
 ```
-Lấy dữ liệu (CSV) → Tiền xử lý (Chuẩn hóa + Tạo chuỗi + Chia tập) → Xây dựng BiLSTM → Huấn luyện (*training*, có callback) → Đánh giá (*evaluation*) → Trực quan hóa (*visualization*) → Lưu báo cáo
+Lấy dữ liệu (CSV)  
+↓  
+Tiền xử lý (Chuẩn hóa + Tạo chuỗi + Chia tập)  
+↓  
+Xây dựng BiLSTM  
+↓  
+Huấn luyện (*training*, có callback)  
+↓  
+Đánh giá (*evaluation*)  
+↓  
+Trực quan hóa (*visualization*)  
+↓  
+Lưu báo cáo
 ```
 
 ### 4.2. Flow chi tiết theo 5 bước
