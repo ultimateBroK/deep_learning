@@ -17,5 +17,7 @@ reports/main/
 reports/notebook/
 *.keras
 *.h5
+.dirac-cache/
+.vscode/
 
 submission/
